@@ -1,11 +1,11 @@
 package access
 
 import (
-	"github.com/danfang/portal-server/api/errs"
-	"github.com/danfang/portal-server/api/routing"
-	"github.com/danfang/portal-server/api/util"
-	"github.com/danfang/portal-server/model"
-	"github.com/danfang/portal-server/model/types"
+	"portal-server/api/errs"
+	"portal-server/api/routing"
+	"portal-server/api/util"
+	"portal-server/model"
+	"portal-server/model/types"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"

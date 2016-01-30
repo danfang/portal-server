@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/danfang/portal-server/model"
+	"portal-server/model"
 	"github.com/google/go-gcm"
 	"log"
 )

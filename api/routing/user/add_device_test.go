@@ -2,9 +2,9 @@ package user
 
 import (
 	"encoding/json"
-	"github.com/danfang/portal-server/api/util"
-	"github.com/danfang/portal-server/model"
-	"github.com/danfang/portal-server/model/types"
+	"portal-server/api/util"
+	"portal-server/model"
+	"portal-server/model/types"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"

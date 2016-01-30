@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/danfang/portal-server/model"
-	"github.com/danfang/portal-server/model/types"
+	"portal-server/model"
+	"portal-server/model/types"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"

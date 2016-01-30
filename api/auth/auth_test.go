@@ -2,7 +2,7 @@ package auth
 
 import (
 	"encoding/json"
-	"github.com/danfang/portal-server/model"
+	"portal-server/model"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"

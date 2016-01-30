@@ -2,7 +2,7 @@ package util
 
 import (
 	"encoding/json"
-	"github.com/danfang/portal-server/api/errs"
+	"portal-server/api/errs"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"

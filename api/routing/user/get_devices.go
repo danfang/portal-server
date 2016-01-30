@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/danfang/portal-server/api/routing"
-	"github.com/danfang/portal-server/model"
-	"github.com/danfang/portal-server/model/types"
+	"portal-server/api/routing"
+	"portal-server/model"
+	"portal-server/model/types"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"

@@ -3,7 +3,7 @@ package access
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/danfang/portal-server/model"
+	"portal-server/model"
 	"github.com/jinzhu/gorm"
 	"time"
 )

@@ -1,7 +1,7 @@
 package routing
 
 import (
-	"github.com/danfang/portal-server/api/errs"
+	"portal-server/api/errs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

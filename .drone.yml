@@ -2,7 +2,6 @@ cache:
   mount:
     - /drone/src
     - /drone/pkg
-    - docker/image.tar
 
 build:
   api:
@@ -30,17 +29,3 @@ build:
       - go get -u github.com/stretchr/testify/assert
       - golint ./gcm/...
       - go test -cover ./gcm/...
-
-publish:
-  docker:
-    username: danfang
-    password: $$DOCKER_PASSWORD
-    email: danfang@uw.edu
-    repo: danfang/portal-server-api
-    tag: latest
-    file: Dockerfile.api
-    save:
-        destination: docker/image.tar
-        tag: latest
-    when:
-      branch: master

@@ -2,9 +2,9 @@ package access
 
 import (
 	"encoding/hex"
-	"github.com/danfang/portal-server/api/errs"
-	"github.com/danfang/portal-server/api/routing"
-	"github.com/danfang/portal-server/model"
+	"portal-server/api/errs"
+	"portal-server/api/routing"
+	"portal-server/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"

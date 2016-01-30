@@ -1,8 +1,8 @@
 package access
 
 import (
-	"github.com/danfang/portal-server/api/errs"
-	"github.com/danfang/portal-server/model"
+	"portal-server/api/errs"
+	"portal-server/model"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"

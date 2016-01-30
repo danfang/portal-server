@@ -9,12 +9,12 @@ RUN go get github.com/lib/pq
 RUN go get github.com/satori/go.uuid
 RUN go get golang.org/x/crypto/pbkdf2
 
-RUN mkdir -p /src/github.com/danfang/portal-server/
+RUN mkdir -p /src/portal-server/
 
-COPY api/ /src/github.com/danfang/portal-server/api/
-COPY model/ /src/github.com/danfang/portal-server/model/
+COPY api/ /src/portal-server/api/
+COPY model/ /src/portal-server/model/
 
-WORKDIR /src/github.com/danfang/portal-server/
+WORKDIR /src/portal-server/
 
 RUN go build -o portalapi ./api
 RUN go build -o dbtool ./model/dbtool

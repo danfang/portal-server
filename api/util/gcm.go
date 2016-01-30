@@ -3,7 +3,7 @@ package util
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/danfang/portal-server/api/errs"
+	"portal-server/api/errs"
 	"io/ioutil"
 	"net/http"
 )

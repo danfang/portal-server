@@ -15,13 +15,14 @@
 package main
 
 import (
-	"github.com/danfang/portal-server/api/auth"
-	"github.com/danfang/portal-server/api/routing/access"
-	"github.com/danfang/portal-server/api/routing/user"
-	"github.com/danfang/portal-server/model"
+	"net/http"
+	"portal-server/api/auth"
+	"portal-server/api/routing/access"
+	"portal-server/api/routing/user"
+	"portal-server/model"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
 )
 
 const (

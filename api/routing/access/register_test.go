@@ -2,7 +2,7 @@ package access
 
 import (
 	"encoding/hex"
-	"github.com/danfang/portal-server/model"
+	"portal-server/model"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"

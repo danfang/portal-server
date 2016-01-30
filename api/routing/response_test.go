@@ -2,7 +2,7 @@ package routing
 
 import (
 	"encoding/json"
-	"github.com/danfang/portal-server/api/errs"
+	"portal-server/api/errs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

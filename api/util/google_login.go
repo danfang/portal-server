@@ -2,7 +2,7 @@ package util
 
 import (
 	"encoding/json"
-	"github.com/danfang/portal-server/api/errs"
+	"portal-server/api/errs"
 	"io/ioutil"
 )
 

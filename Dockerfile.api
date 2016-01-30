@@ -11,15 +11,13 @@ RUN go get golang.org/x/crypto/pbkdf2
 
 RUN mkdir -p /src/portal-server/
 
-COPY api/ /src/portal-server/api/
-COPY model/ /src/portal-server/model/
+COPY . /src/portal-server/
 
 WORKDIR /src/portal-server/
 
 RUN go build -o portalapi ./api
-RUN go build -o dbtool ./model/dbtool
+RUN go build -o dbtool ./dbtool
 
 EXPOSE 8080
 
 CMD ./portalapi
-

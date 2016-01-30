@@ -1,7 +1,5 @@
 #### joe made this: https://goel.io/joe
 
-portalapi
-dbtool
 secrets.yml
 
 #####=== IntelliJ ===#####
@@ -39,4 +37,3 @@ _testmain.go
 *.exe
 *.test
 *.prof
-

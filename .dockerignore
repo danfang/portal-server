@@ -1,4 +1,5 @@
-dbtool
-portalapi
-portalgcm
 .git/
+secrets.yml
+.drone.yml
+.drone.sec
+README.md

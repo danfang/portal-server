@@ -1,0 +1,46 @@
+cache:
+  mount:
+    - /drone/src
+    - /drone/pkg
+    - docker/image.tar
+
+build:
+  api:
+    image: golang:1.5
+    commands:
+      - go get -u github.com/asaskevich/govalidator
+      - go get -u github.com/gin-gonic/gin
+      - go get -u github.com/golang/lint/golint
+      - go get -u github.com/jinzhu/gorm
+      - go get -u github.com/mattn/go-sqlite3
+      - go get -u github.com/satori/go.uuid
+      - go get -u github.com/stretchr/testify/assert
+      - go get -u golang.org/x/crypto/pbkdf2
+      - golint ./api/...
+      - go test -cover ./api/...
+  gcm:
+    image: golang:1.5
+    commands:
+      - go get -u github.com/asaskevich/govalidator
+      - go get -u github.com/google/go-gcm
+      - go get -u github.com/golang/lint/golint
+      - go get -u github.com/jinzhu/gorm
+      - go get -u github.com/mattn/go-sqlite3
+      - go get -u github.com/satori/go.uuid
+      - go get -u github.com/stretchr/testify/assert
+      - golint ./gcm/...
+      - go test -cover ./gcm/...
+
+publish:
+  docker:
+    username: danfang
+    password: $$DOCKER_PASSWORD
+    email: danfang@uw.edu
+    repo: danfang/portal-server-api
+    tag: latest
+    file: Dockerfile.api
+    save:
+        destination: docker/image.tar
+        tag: latest
+    when:
+      branch: master

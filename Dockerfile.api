@@ -1,0 +1,25 @@
+FROM golang:1.5
+
+ENV GOPATH=/
+
+RUN go get github.com/asaskevich/govalidator
+RUN go get github.com/gin-gonic/gin
+RUN go get github.com/jinzhu/gorm
+RUN go get github.com/lib/pq
+RUN go get github.com/satori/go.uuid
+RUN go get golang.org/x/crypto/pbkdf2
+
+RUN mkdir -p /src/github.com/danfang/portal-server/
+
+COPY api/ /src/github.com/danfang/portal-server/api/
+COPY model/ /src/github.com/danfang/portal-server/model/
+
+WORKDIR /src/github.com/danfang/portal-server/
+
+RUN go build -o portalapi ./api
+RUN go build -o dbtool ./model/dbtool
+
+EXPOSE 8080
+
+CMD ./portalapi
+

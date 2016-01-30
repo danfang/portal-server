@@ -1,0 +1,21 @@
+FROM golang:1.5
+
+ENV GOPATH=/
+
+RUN go get github.com/asaskevich/govalidator
+RUN go get github.com/lib/pq
+RUN go get github.com/jinzhu/gorm
+RUN go get github.com/google/go-gcm
+RUN go get github.com/satori/go.uuid
+
+RUN mkdir -p /src/github.com/danfang/portal-server/
+
+COPY gcm/ /src/github.com/danfang/portal-server/gcm/
+COPY model/ /src/github.com/danfang/portal-server/model/
+
+WORKDIR /src/github.com/danfang/portal-server/
+
+RUN go build -o portalgcm ./gcm
+
+CMD ./portalgcm
+

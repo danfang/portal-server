@@ -38,12 +38,10 @@ publish:
   gcr:
     repo: portal/api
     file: Dockerfile.api
-    registry: us.gcr.io
     token: >
       $$GOOGLE_KEY
   gcr:
     repo: portal/gcm
     file: Dockerfile.gcm
-    registry: us.gcr.io
     token: >
       $$GOOGLE_KEY

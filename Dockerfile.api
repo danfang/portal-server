@@ -16,7 +16,7 @@ COPY . /src/portal-server/
 WORKDIR /src/portal-server/
 
 RUN go build -o portalapi ./api
-RUN go build -o dbtool ./dbtool
+RUN go build -o dbtool ./tool
 
 EXPOSE 8080
 

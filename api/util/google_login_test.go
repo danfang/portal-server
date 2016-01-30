@@ -2,9 +2,10 @@ package util
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func expectLoginRequest(t *testing.T, idToken string) func(*http.Request) {

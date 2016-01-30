@@ -1,16 +1,17 @@
 package access
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"portal-server/api/errs"
 	"portal-server/model"
+	"testing"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
 )
 
 var verifyUserDB gorm.DB

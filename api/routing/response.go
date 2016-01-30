@@ -1,9 +1,10 @@
 package routing
 
 import (
-	"portal-server/api/errs"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"portal-server/api/errs"
+
+	"github.com/gin-gonic/gin"
 )
 
 // An ErrorResponse wraps a bad request with an error code string.

@@ -3,14 +3,15 @@ package user
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"net/http"
 	"portal-server/api/errs"
 	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
 	"portal-server/model/types"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
 )
 
 const gcmEndpoint = "https://android.googleapis.com/gcm/notification"

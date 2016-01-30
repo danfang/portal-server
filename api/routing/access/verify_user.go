@@ -1,13 +1,14 @@
 package access
 
 import (
+	"net/http"
 	"portal-server/api/errs"
 	"portal-server/api/routing"
 	"portal-server/model"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
-	"time"
 )
 
 // A VerificationToken is a token generated on account creation and emailed

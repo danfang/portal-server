@@ -1,12 +1,13 @@
 package user
 
 import (
+	"net/http"
 	"portal-server/api/routing"
 	"portal-server/model"
 	"portal-server/model/types"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
 )
 
 // DeviceListResponse contains existing, connected user devices.

@@ -2,15 +2,16 @@ package user
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
 	"portal-server/api/util"
 	"portal-server/model"
 	"portal-server/model/types"
+	"testing"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 var addDeviceDB gorm.DB

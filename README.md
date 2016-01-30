@@ -1,9 +1,9 @@
 Portal API Server
 ==
 
-[![Build Status](http://52.89.157.164/api/badges/danfang/portal-server/status.svg)](http://52.89.157.164/danfang/portal-server)
+[![Build Status](https://build.portalmessaging.com/api/badges/backend/portal-server/status.svg)](https://build.portalmessaging.com/backend/portal-server)
 
-[API Documentation](http://52.89.157.164:8000/) via [Swagger.io](http://swagger.io).
+[API Documentation](http://52.89.157.164:8000/) can be found here.
 
 This repository manages the API server, GCM server, and data store for the Portal Messaging service.
 

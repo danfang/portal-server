@@ -3,9 +3,9 @@ package util
 import (
 	"bytes"
 	"encoding/json"
-	"portal-server/api/errs"
 	"io/ioutil"
 	"net/http"
+	"portal-server/api/errs"
 )
 
 const (

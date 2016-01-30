@@ -2,12 +2,13 @@ package access
 
 import (
 	"encoding/hex"
+	"net/http"
 	"portal-server/api/errs"
 	"portal-server/api/routing"
 	"portal-server/model"
-	"github.com/gin-gonic/gin"
-	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // A PasswordLogin is a JSON structure for user logins via email and password.

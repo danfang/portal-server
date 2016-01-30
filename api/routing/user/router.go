@@ -1,8 +1,9 @@
 package user
 
 import (
-	"github.com/jinzhu/gorm"
 	"net/http"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Router handles authenticated user operations.

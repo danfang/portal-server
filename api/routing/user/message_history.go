@@ -1,11 +1,12 @@
 package user
 
 import (
+	"net/http"
 	"portal-server/api/routing"
 	"portal-server/model"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
 )
 
 // MessageHistoryResponse contains user messages.

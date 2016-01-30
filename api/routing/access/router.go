@@ -1,8 +1,9 @@
 package access
 
 import (
-	"github.com/jinzhu/gorm"
 	"net/http"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Router handles access routes for user creation and authentication.

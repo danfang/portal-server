@@ -3,18 +3,19 @@ package access
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"portal-server/api/errs"
 	"portal-server/api/util"
 	"portal-server/model"
 	"portal-server/model/types"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 var googleLoginDB gorm.DB

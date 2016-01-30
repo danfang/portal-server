@@ -2,8 +2,8 @@ package util
 
 import (
 	"encoding/json"
-	"portal-server/api/errs"
 	"io/ioutil"
+	"portal-server/api/errs"
 )
 
 // A GoogleUser is a user as represented by Google OAuth.

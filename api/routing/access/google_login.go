@@ -1,15 +1,16 @@
 package access
 
 import (
+	"net/http"
 	"portal-server/api/errs"
 	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
 	"portal-server/model/types"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
-	"net/http"
 )
 
 var googleOAuthEndpoint = "https://www.googleapis.com/oauth2/v3/tokeninfo"

@@ -3,14 +3,15 @@ package access
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"net/http"
 	"portal-server/api/errs"
 	"portal-server/api/routing"
 	"portal-server/model"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
-	"net/http"
-	"time"
 )
 
 // A PasswordRegistration is a JSON structure for user registration.

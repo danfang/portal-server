@@ -3,8 +3,9 @@ package access
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"golang.org/x/crypto/pbkdf2"
 	"log"
+
+	"golang.org/x/crypto/pbkdf2"
 )
 
 func sendTokenToUser(email, token string) error {

@@ -1,10 +1,11 @@
 package routing
 
 import (
-	"github.com/asaskevich/govalidator"
-	"portal-server/api/errs"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"portal-server/api/errs"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gin-gonic/gin"
 )
 
 // ValidateJSON writes a response if there are JSON marshalling

@@ -3,8 +3,9 @@ package routing
 import (
 	"encoding/json"
 	"portal-server/api/errs"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRenderError(t *testing.T) {

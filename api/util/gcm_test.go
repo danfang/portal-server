@@ -2,11 +2,12 @@ package util
 
 import (
 	"encoding/json"
-	"portal-server/api/errs"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
+	"portal-server/api/errs"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func expectRequest(t *testing.T, body interface{}) func(*http.Request) {

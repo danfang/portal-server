@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"github.com/gin-gonic/gin"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CORSMiddleware is Gin middleware that allows for fine-grained

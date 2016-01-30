@@ -2,10 +2,11 @@ package access
 
 import (
 	"portal-server/model"
+	"testing"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var userTokenDB gorm.DB

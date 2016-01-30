@@ -3,6 +3,10 @@ cache:
     - /drone/src
     - /drone/pkg
 
+clone:
+  depth: 50
+  path: portal-server
+
 build:
   api:
     image: golang:1.5

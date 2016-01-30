@@ -39,9 +39,9 @@ publish:
     repo: portal/api
     file: Dockerfile.api
     token: >
-      $$GOOGLE_KEY
+      $$GCR_KEY
   gcr:
     repo: portal/gcm
     file: Dockerfile.gcm
     token: >
-      $$GOOGLE_KEY
+      $$GCR_KEY

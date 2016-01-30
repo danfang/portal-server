@@ -33,3 +33,10 @@ build:
       - go get -u github.com/stretchr/testify/assert
       - golint ./gcm/...
       - go test -cover ./gcm/...
+
+publish:
+  gcr:
+    repo: portal/api
+    registry: us.gcr.io
+    token: >
+      $$GOOGLE_KEY

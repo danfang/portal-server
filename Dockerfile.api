@@ -11,7 +11,9 @@ RUN go get golang.org/x/crypto/pbkdf2
 
 RUN mkdir -p /src/portal-server/
 
-COPY . /src/portal-server/
+COPY api/ /src/portal-server/gcm/
+COPY model/ /src/portal-server/model/
+COPY tool/ /src/portal-server/tool/
 
 WORKDIR /src/portal-server/
 

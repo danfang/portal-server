@@ -36,12 +36,12 @@ build:
 
 publish:
   gcr:
-    repo: portal/api
+    repo: gcr.io/messaging-1174/portal/api
     file: Dockerfile.api
     token: >
       $$GCR_KEY
   gcr:
-    repo: portal/gcm
+    repo: gcr.io/messaging-1174/portal/gcm
     file: Dockerfile.gcm
     token: >
       $$GCR_KEY

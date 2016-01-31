@@ -1,7 +1,7 @@
 // The Portal Messaging API.
 //
-//     Schemes: http
-//     Host: 52.89.157.164:8080
+//     Schemes: https
+//     Host: https://dev.portalmessaging.com
 //     BasePath: /v1
 //     Version: 0.0.1
 //
@@ -45,7 +45,7 @@ func API(db *gorm.DB) *gin.Engine {
 	{
 		accessGroup := v1.Group("/")
 		{
-			accessRouter := access.Router{db, httpClient}
+			accessRouter := access.Router{Db: db, HTTPClient: httpClient}
 
 			// swagger:route POST /register register
 			//
@@ -57,7 +57,7 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
 			// 		 default: detailError
@@ -76,7 +76,7 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
 			// 		 default: detailError
@@ -95,6 +95,8 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
+			//     Schemes: https
+			//
 			//     Responses:
 			// 	     default: detailError
 			//       200: loginResponse
@@ -109,19 +111,19 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
 			//       200: success
 			// 	     400: error
-			//		 500: error
+			//		   500: error
 			accessGroup.GET("/verify/:token", accessRouter.VerifyUserEndpoint)
 		}
 
 		userGroup := v1.Group("/user")
 		userGroup.Use(auth.AuthenticationMiddleware(db))
 		{
-			userRouter := user.Router{db, httpClient}
+			userRouter := user.Router{Db: db, HTTPClient: httpClient}
 
 			// swagger:route POST /user/devices user addDevice
 			//
@@ -133,12 +135,12 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
-			//       200: addDevice
-			//		 401: error
-			//		 500: error
+			//       200: addDeviceResponse
+			//		   401: error
+			//		   500: error
 			//       default: detailError
 			userGroup.POST("/devices", userRouter.AddDeviceEndpoint)
 
@@ -149,7 +151,7 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
 			//       200: deviceList
@@ -165,7 +167,7 @@ func API(db *gorm.DB) *gin.Engine {
 			//     Produces:
 			//     - application/json
 			//
-			//     Schemes: http
+			//     Schemes: https
 			//
 			//     Responses:
 			//       200: messageHistory

@@ -30,7 +30,7 @@ func TestCreateDevice(t *testing.T) {
 
 	addDeviceDB.Create(&user)
 
-	body := &addDevice{
+	body := &addDeviceParam{
 		RegistrationID: "a_token",
 		Type:           types.DeviceTypePhone,
 	}

@@ -16,16 +16,16 @@ import (
 
 const gcmEndpoint = "https://android.googleapis.com/gcm/notification"
 
-// AddDevice is a JSON structure for registering a GCM device.
+// AddDeviceParam is a JSON structure for registering a GCM device.
 //
 // swagger:parameters addDevice
-type AddDevice struct {
+type AddDeviceParam struct {
 	// in: body
 	// required: true
-	Body addDevice `json:"add_device"`
+	Body addDeviceParam `json:"add_device"`
 }
 
-type addDevice struct {
+type addDeviceParam struct {
 	// required: true
 	RegistrationID string `json:"registration_id" valid:"required"`
 
@@ -40,7 +40,7 @@ type addDevice struct {
 // AddDeviceResponse contains the encryption and
 // notifica†ion keys for a new GCM client.
 //
-// swagger:response addDevice
+// swagger:response addDeviceResponse
 type AddDeviceResponse struct {
 	// in: body
 	Body addDeviceResponse `json:"add_device"`
@@ -56,7 +56,7 @@ type addDeviceResponse struct {
 func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 
-	var body addDevice
+	var body addDeviceParam
 	if !routing.ValidateJSON(c, &body) {
 		return
 	}
@@ -78,7 +78,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 		return
 	}
 
-	gcmClient := &util.WebClient{gcmEndpoint, r.HTTPClient}
+	gcmClient := &util.WebClient{BaseURL: gcmEndpoint, HTTPClient: r.HTTPClient}
 
 	notificationKey, err := createNotificationKey(tx, gcmClient, userID, device.RegistrationID)
 	if err, isGCMError := err.(errs.GCMError); isGCMError {
@@ -109,7 +109,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	})
 }
 
-func createDevice(db *gorm.DB, userID uint, body *addDevice) (*model.Device, error) {
+func createDevice(db *gorm.DB, userID uint, body *addDeviceParam) (*model.Device, error) {
 	device := model.Device{
 		UserID:         userID,
 		RegistrationID: body.RegistrationID,

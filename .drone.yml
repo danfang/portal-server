@@ -34,6 +34,12 @@ build:
       - golint ./gcm/...
       - go test -cover ./gcm/...
 
+notify:
+  slack:
+    webhook_url: https://hooks.slack.com/services/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
+    channel: build
+    username: drone
+
 publish:
   gcr:
     when:

@@ -95,7 +95,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 		return
 	}
 
-	encryptionKey, err := createEncryptionKey(tx, userID)
+	encryptionKey, err := getEncryptionKey(tx, userID)
 	if err != nil {
 		tx.Rollback()
 		routing.InternalServiceError(c, err)
@@ -158,10 +158,10 @@ func createNotificationKey(db *gorm.DB, gc *util.WebClient, userID uint, registr
 	return &notificationKey, nil
 }
 
-func createEncryptionKey(db *gorm.DB, userID uint) (*model.EncryptionKey, error) {
+func getEncryptionKey(db *gorm.DB, userID uint) (*model.EncryptionKey, error) {
 	var encryptionKey model.EncryptionKey
 	if db.Where(model.EncryptionKey{UserID: userID}).First(&encryptionKey).RecordNotFound() {
-		key := make([]byte, 48)
+		key := make([]byte, 32)
 		if _, err := rand.Read(key); err != nil {
 			return nil, err
 		}

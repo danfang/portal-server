@@ -124,12 +124,12 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 	server.Close()
 }
 
-func TestCreateEncryptionKey(t *testing.T) {
+func TestGetEncryptionKey(t *testing.T) {
 	user := model.User{Email: "test4@portal.com"}
 	addDeviceDB.Create(&user)
 
 	// Create the key
-	key1, err := createEncryptionKey(&addDeviceDB, user.ID)
+	key1, err := getEncryptionKey(&addDeviceDB, user.ID)
 	assert.NoError(t, err)
 	assert.Regexp(t, "^[a-fA-F0-9]+$", key1.Key)
 
@@ -139,7 +139,7 @@ func TestCreateEncryptionKey(t *testing.T) {
 	assert.Equal(t, user.Email, fromDB.Email)
 
 	// Attempt to create a duplicate key
-	key2, err := createEncryptionKey(&addDeviceDB, user.ID)
+	key2, err := getEncryptionKey(&addDeviceDB, user.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, key1.Key, key2.Key)
 

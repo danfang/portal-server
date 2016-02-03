@@ -47,7 +47,7 @@ type MessagePayload struct {
 	To        string `json:"to" valid:"required"`
 	Status    string `json:"status" valid:"required,matches(started|sent|delivered|failed)"`
 	Body      string `json:"body" valid:"required"`
-	At        string `json:"at" valid:"required"`
+	At        int    `json:"at" valid:"required"`
 }
 
 // StatusPayload is the message structure sent when a Portal client updates
@@ -55,7 +55,7 @@ type MessagePayload struct {
 type StatusPayload struct {
 	MessageID string `json:"mid" valid:"required"`
 	Status    string `json:"status" valid:"required,matches(sent|delivered|failed)"`
-	At        string `json:"at" valid:"required"`
+	At        int    `json:"at" valid:"required"`
 }
 
 // OnMessageReceived handles all incoming GCM messages, performing

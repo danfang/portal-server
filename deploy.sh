@@ -12,9 +12,9 @@ docker rm -f portal_gcm
 
 echo "Fetching latest images..."
 
-docker pull $DB_CONTAINER:latest
-docker pull $API_CONTAINER:latest
-docker pull $GCM_CONTAINER:latest
+gcloud docker pull $DB_CONTAINER:latest
+gcloud docker pull $API_CONTAINER:latest
+gcloud docker pull $GCM_CONTAINER:latest
 
 echo "Starting the portal database..."
 

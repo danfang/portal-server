@@ -88,7 +88,7 @@ func TestGetPayload_MessagePayload(t *testing.T) {
 		"to":     "phone_number",
 		"status": "started",
 		"body":   "hello",
-		"at":     "1351700038",
+		"at":     1351700038,
 	})
 	var m MessagePayload
 	err := getPayload(string(payload), &m)
@@ -97,7 +97,7 @@ func TestGetPayload_MessagePayload(t *testing.T) {
 	assert.Equal(t, "phone_number", m.To)
 	assert.Equal(t, "started", m.Status)
 	assert.Equal(t, "hello", m.Body)
-	assert.Equal(t, "1351700038", m.At)
+	assert.Equal(t, 1351700038, m.At)
 }
 
 func TestGetPayload_MessagePayload_InvalidType(t *testing.T) {
@@ -120,21 +120,21 @@ func TestGetPayload_StatusPayload(t *testing.T) {
 	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    "message_id",
 		"status": "sent",
-		"at":     "1351700038",
+		"at":     1351700038,
 	})
 	var m StatusPayload
 	err := getPayload(string(payload), &m)
 	assert.NoError(t, err)
 	assert.Equal(t, "message_id", m.MessageID)
 	assert.Equal(t, "sent", m.Status)
-	assert.Equal(t, "1351700038", m.At)
+	assert.Equal(t, 1351700038, m.At)
 }
 
 func TestGetPayload_StatusPayload_ValidationFailure(t *testing.T) {
 	payload := map[string]interface{}{
 		"mid":    "message_id",
 		"status": "bad_status",
-		"at":     "1351700038",
+		"at":     1351700038,
 	}
 	var m StatusPayload
 	err := getPayload(payload, &m)
@@ -164,7 +164,7 @@ func TestOnMessageReceived_ValidNewMessage(t *testing.T) {
 	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    messageID,
 		"status": "started",
-		"at":     "2015-06-09 08:00:00",
+		"at":     1351700038,
 		"to":     "encrypted_phone_number",
 		"body":   "encrypted_body",
 	})
@@ -196,7 +196,7 @@ func TestOnMessageReceived_DeviceNotFound(t *testing.T) {
 	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    messageID,
 		"status": "started",
-		"at":     "2015-06-09 08:00:00",
+		"at":     1351700038,
 		"to":     "encrypted_phone_number",
 		"body":   "encrypted_body",
 	})
@@ -225,7 +225,7 @@ func TestOnMessageReceived_BadDiscriminator(t *testing.T) {
 	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    messageID,
 		"status": "started",
-		"at":     "2015-06-09 08:00:00",
+		"at":     1351700038,
 		"to":     "encrypted_phone_number",
 		"body":   "encrypted_body",
 	})

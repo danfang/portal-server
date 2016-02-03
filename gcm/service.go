@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"github.com/asaskevich/govalidator"
+	"log"
 	"portal-server/model"
 	"portal-server/model/types"
+
+	"github.com/asaskevich/govalidator"
 	"github.com/google/go-gcm"
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
-	"log"
 )
 
 // A GCMService handles upstream messages from a CloudConnectionService
@@ -105,15 +106,11 @@ func (s GCMService) errorMessage(to string, err error, reason string) {
 }
 
 func getPayload(payload interface{}, result interface{}) error {
-	payload, ok := payload.(map[string]interface{})
+	byteString, ok := payload.(string)
 	if !ok {
 		return errors.New("invalid_payload_json")
 	}
-	bytes, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(bytes, result); err != nil {
+	if err := json.Unmarshal([]byte(byteString), result); err != nil {
 		return err
 	}
 	if _, err := govalidator.ValidateStruct(result); err != nil {

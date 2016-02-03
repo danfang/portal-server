@@ -1,16 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"portal-server/gcm/testutil"
 	"portal-server/model"
 	"portal-server/model/types"
+	"testing"
+
 	"github.com/google/go-gcm"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var testDb gorm.DB
@@ -81,15 +83,15 @@ func TestErrorMessage(t *testing.T) {
 }
 
 func TestGetPayload_MessagePayload(t *testing.T) {
-	payload := map[string]interface{}{
+	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    "message_id",
 		"to":     "phone_number",
 		"status": "started",
 		"body":   "hello",
 		"at":     "1351700038",
-	}
+	})
 	var m MessagePayload
-	err := getPayload(payload, &m)
+	err := getPayload(string(payload), &m)
 	assert.NoError(t, err)
 	assert.Equal(t, "message_id", m.MessageID)
 	assert.Equal(t, "phone_number", m.To)
@@ -106,22 +108,22 @@ func TestGetPayload_MessagePayload_InvalidType(t *testing.T) {
 }
 
 func TestGetPayload_MessagePayload_ValidationFailure(t *testing.T) {
-	payload := map[string]interface{}{
+	payload, _ := json.Marshal(map[string]interface{}{
 		"mid": "message_id",
-	}
+	})
 	var m MessagePayload
-	err := getPayload(payload, &m)
+	err := getPayload(string(payload), &m)
 	assert.Error(t, err)
 }
 
 func TestGetPayload_StatusPayload(t *testing.T) {
-	payload := map[string]interface{}{
+	payload, _ := json.Marshal(map[string]interface{}{
 		"mid":    "message_id",
 		"status": "sent",
 		"at":     "1351700038",
-	}
+	})
 	var m StatusPayload
-	err := getPayload(payload, &m)
+	err := getPayload(string(payload), &m)
 	assert.NoError(t, err)
 	assert.Equal(t, "message_id", m.MessageID)
 	assert.Equal(t, "sent", m.Status)
@@ -159,17 +161,18 @@ func TestOnMessageReceived_ValidNewMessage(t *testing.T) {
 		},
 	}
 	service := GCMService{&testDb, ccs}
+	payload, _ := json.Marshal(map[string]interface{}{
+		"mid":    messageID,
+		"status": "started",
+		"at":     "2015-06-09 08:00:00",
+		"to":     "encrypted_phone_number",
+		"body":   "encrypted_body",
+	})
 	service.OnMessageReceived(gcm.CcsMessage{
 		From: registrationID,
 		Data: map[string]interface{}{
-			"type": "message",
-			"payload": map[string]interface{}{
-				"mid":    messageID,
-				"status": "started",
-				"at":     "2015-06-09 08:00:00",
-				"to":     "encrypted_phone_number",
-				"body":   "encrypted_body",
-			},
+			"type":    "message",
+			"payload": string(payload),
 		},
 	})
 	var fromDB model.Message
@@ -190,17 +193,18 @@ func TestOnMessageReceived_DeviceNotFound(t *testing.T) {
 		},
 	}
 	service := GCMService{&testDb, ccs}
+	payload, _ := json.Marshal(map[string]interface{}{
+		"mid":    messageID,
+		"status": "started",
+		"at":     "2015-06-09 08:00:00",
+		"to":     "encrypted_phone_number",
+		"body":   "encrypted_body",
+	})
 	service.OnMessageReceived(gcm.CcsMessage{
 		From: registrationID,
 		Data: map[string]interface{}{
-			"type": "message",
-			"payload": map[string]interface{}{
-				"mid":    messageID,
-				"status": "started",
-				"at":     "2015-06-09 08:00:00",
-				"to":     "encrypted_phone_number",
-				"body":   "encrypted_body",
-			},
+			"type":    "message",
+			"payload": string(payload),
 		},
 	})
 	var count int
@@ -218,17 +222,18 @@ func TestOnMessageReceived_BadDiscriminator(t *testing.T) {
 		},
 	}
 	service := GCMService{&testDb, ccs}
+	payload, _ := json.Marshal(map[string]interface{}{
+		"mid":    messageID,
+		"status": "started",
+		"at":     "2015-06-09 08:00:00",
+		"to":     "encrypted_phone_number",
+		"body":   "encrypted_body",
+	})
 	service.OnMessageReceived(gcm.CcsMessage{
 		From: registrationID,
 		Data: map[string]interface{}{
-			"type": "bad_discriminator",
-			"payload": map[string]interface{}{
-				"mid":    messageID,
-				"status": "started",
-				"at":     "2015-06-09 08:00:00",
-				"to":     "encrypted_phone_number",
-				"body":   "encrypted_body",
-			},
+			"type":    "bad_discriminator",
+			"payload": string(payload),
 		},
 	})
 	var count int
@@ -250,7 +255,7 @@ func TestOnMessageReceived_BadPayload(t *testing.T) {
 		From: registrationID,
 		Data: map[string]interface{}{
 			"type":    "message",
-			"payload": map[string]interface{}{"bad_field": 0},
+			"payload": `{"bad_field": 0}`,
 		},
 	})
 	var count int

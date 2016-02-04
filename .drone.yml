@@ -43,14 +43,14 @@ notify:
 publish:
   gcr:
     when:
-      branch: master
+      event: tag
     repo: gcr.io/messaging-1174/portal/api
     file: Dockerfile.api
     token: >
       $$GCR_KEY
   gcr:
     when:
-      branch: master
+      event: tag
     repo: gcr.io/messaging-1174/portal/gcm
     file: Dockerfile.gcm
     token: >

@@ -131,7 +131,7 @@ func TestGetEncryptionKey(t *testing.T) {
 	// Create the key
 	key1, err := getEncryptionKey(&addDeviceDB, user.ID)
 	assert.NoError(t, err)
-	assert.Regexp(t, "^[a-fA-F0-9]+$", key1.Key)
+	assert.Regexp(t, "^[a-fA-F0-9]{64}$", key1.Key)
 
 	var fromDB model.User
 	addDeviceDB.Model(key1).Related(&fromDB)

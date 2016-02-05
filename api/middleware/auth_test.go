@@ -8,15 +8,15 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
 const expectedResponse = "done"
 
 var auth *gin.Engine
-var authDb gorm.DB
+var authStore store.Store
 
 func createUser(uuid, token string, verified bool) {
 	user := model.User{
@@ -24,22 +24,19 @@ func createUser(uuid, token string, verified bool) {
 		Email:    uuid + "@portal.com",
 		Verified: verified,
 	}
-	authDb.Create(&user)
-	authDb.Create(&model.UserToken{User: user, Token: token})
+	authStore.Users().CreateUser(&user)
+	authStore.UserTokens().CreateToken(&model.UserToken{User: user, Token: token})
 }
 
 func init() {
-	gin.SetMode(gin.TestMode)
-
-	authDb, _ = gorm.Open("sqlite3", ":memory:")
-	authDb.LogMode(false)
-	authDb.CreateTable(&model.User{}, &model.UserToken{})
+	authStore = store.GetTestStore()
 
 	createUser("1", "user_token_1", false)
 	createUser("2", "user_token_2", true)
 
 	auth = gin.New()
-	auth.Use(AuthenticationMiddleware(&authDb))
+	gin.SetMode(gin.TestMode)
+	auth.Use(AuthenticationMiddleware(authStore))
 	auth.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, expectedResponse)
 	})

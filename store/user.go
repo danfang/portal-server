@@ -11,6 +11,7 @@ type UserStore interface {
 	FindUser(where *User) (*User, bool)
 	FindOrCreateUser(where *User, attrs *User) (*User, error)
 	UserCount(where *User) int
+	GetRelated(user *User, related interface{}) error
 }
 
 type userStore struct {
@@ -45,4 +46,8 @@ func (db userStore) UserCount(where *User) int {
 	var count int
 	db.Where(where).Count(&count)
 	return count
+}
+
+func (db userStore) GetRelated(user *User, related interface{}) error {
+	return db.Model(user).Related(related).Error
 }

@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -158,11 +157,10 @@ func TestGoogleLoginEndpoint_ExistingUserAndGoogleAccount(t *testing.T) {
 	assertValidLoginResponse(t, w)
 
 	// Check linked account is in DB
-	var linkedAccountCount int
-	googleLoginStore.LinkedAccounts().FindAccount(model.LinkedAccount{}).Where(model.LinkedAccount{
+	linkedAccountCount := googleLoginStore.LinkedAccounts().GetCount(&model.LinkedAccount{
 		AccountID: "existing_user_and_account_sub",
 		Type:      model.LinkedAccountTypeGoogle,
-	}).Count(&linkedAccountCount)
+	})
 
 	assert.Equal(t, 1, linkedAccountCount)
 }
@@ -178,14 +176,13 @@ func TestCreateLinkedGoogleAccount(t *testing.T) {
 	user, err := createLinkedGoogleAccount(&googleLoginStore, &googleUser)
 	assert.NoError(t, err)
 
-	var fromDB model.User
-	googleLoginStore.Where(model.User{Email: "google@google.com"}).First(&fromDB)
+	fromDB, _ := googleLoginStore.Users().FindUser(&model.User{Email: "google@google.com"})
 	assert.Equal(t, fromDB.FirstName, "Jon")
 	assert.Equal(t, fromDB.LastName, "Snow")
 	assert.True(t, fromDB.Verified)
 
 	var linkedAccount model.LinkedAccount
-	googleLoginStore.Model(&user).Related(&linkedAccount)
+	googleLoginStore.Users().GetRelated(user, &linkedAccount)
 	assert.Equal(t, linkedAccount.AccountID, "10000")
 	assert.Equal(t, linkedAccount.Type, "google")
 }
@@ -199,7 +196,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_NoLinkedAccount(t *testing.T) {
 		Password:  "my_password",
 	}
 
-	googleLoginStore.Create(&original)
+	googleLoginStore.Users().CreateUser(&original)
 
 	googleUser := util.GoogleUser{
 		GivenName:     "Stan",
@@ -212,8 +209,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_NoLinkedAccount(t *testing.T) {
 	user, err := createLinkedGoogleAccount(&googleLoginStore, &googleUser)
 	assert.NoError(t, err)
 
-	var fromDB model.User
-	googleLoginStore.Where(model.User{Email: "stannis@portal.com"}).First(&fromDB)
+	fromDB, _ := googleLoginStore.Users().FindUser(&model.User{Email: "stannis@portal.com"})
 
 	assert.Equal(t, "Stannis", fromDB.FirstName)
 	assert.Equal(t, "Baratheon", fromDB.LastName)
@@ -223,7 +219,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_NoLinkedAccount(t *testing.T) {
 	assert.Equal(t, "", fromDB.Password)
 
 	var linkedAccount model.LinkedAccount
-	googleLoginStore.Model(&user).Related(&linkedAccount)
+	googleLoginStore.Users().GetRelated(user, &linkedAccount)
 	assert.Equal(t, "12345", linkedAccount.AccountID)
 	assert.Equal(t, model.LinkedAccountTypeGoogle, linkedAccount.Type)
 }
@@ -235,7 +231,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 		Email: "existing@portal.com",
 	}
 
-	googleLoginStore.Create(&original)
+	googleLoginStore.Users().CreateUser(&original)
 
 	linkedAccount := model.LinkedAccount{
 		User:      original,
@@ -243,7 +239,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 		Type:      model.LinkedAccountTypeGoogle,
 	}
 
-	googleLoginStore.Create(&linkedAccount)
+	googleLoginStore.Users().CreateUser(&linkedAccount)
 
 	googleUser := util.GoogleUser{
 		Sub:   googleAccountID,
@@ -257,11 +253,10 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 	assert.Equal(t, original.Email, user.Email)
 
 	// Make sure no new linked account is created.
-	var count int
-	googleLoginStore.Model(&linkedAccount).Where(model.LinkedAccount{
+	count := googleLoginStore.LinkedAccounts().GetCount(&model.LinkedAccount{
 		AccountID: googleAccountID,
 		Type:      model.LinkedAccountTypeGoogle,
-	}).Count(&count)
+	})
 	assert.Equal(t, 1, count)
 }
 

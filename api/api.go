@@ -1,14 +1,11 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller/access"
 	"portal-server/api/controller/user"
 	"portal-server/api/middleware"
-	"portal-server/model"
-
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"portal-server/store"
 )
 

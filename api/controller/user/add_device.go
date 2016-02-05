@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"portal-server/store"
 )
 
 const gcmEndpoint = "https://android.googleapis.com/gcm/notification"
@@ -34,22 +35,22 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 		return
 	}
 
-	tx := r.Db.Begin()
+	var device *model.Device
+	r.Store.Transaction(func(tx store.Store) error {
+		var err error
+		if tx.Devices().DeviceCount(&model.Device{RegistrationID: body.RegistrationID}) >= 1 {
+			err = errs.ErrDuplicateDeviceToken
+			c.JSON(http.StatusBadRequest, controller.RenderError(err))
+			return err
+		}
 
-	var count int
-	if tx.Model(model.Device{}).Where(model.Device{
-		RegistrationID: body.RegistrationID,
-	}).Count(&count); count >= 1 {
-		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrDuplicateDeviceToken))
-		return
-	}
-
-	device, err := createDevice(tx, user, &body)
-	if err != nil {
-		tx.Rollback()
-		controller.InternalServiceError(c, err)
-		return
-	}
+		device, err = createDevice(tx, user, &body)
+		if err != nil {
+			controller.InternalServiceError(c, err)
+			return err
+		}
+		return nil
+	})
 
 	gcmClient := &util.WebClient{BaseURL: gcmEndpoint, HTTPClient: r.HTTPClient}
 

@@ -10,15 +10,15 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
 var api *gin.Engine
 
 func init() {
-	gin.SetMode(gin.TestMode)
-	db, _ := gorm.Open("sqlite3", ":memory:")
-	db.LogMode(false)
-	api = API(&db)
+	store := store.GetTestStore()
+	httpClient := http.DefaultClient
+	api = API(store, httpClient)
 }
 
 func TestIndex(t *testing.T) {

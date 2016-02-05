@@ -3,8 +3,8 @@ package access
 import (
 	"encoding/hex"
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/model"
 	"strings"
 
@@ -19,18 +19,18 @@ type passwordLogin struct {
 // LoginEndpoint handles a POST request for a user to login via email and password.
 func (r Router) LoginEndpoint(c *gin.Context) {
 	var body passwordLogin
-	if !routing.ValidJSON(c, &body) {
+	if !controller.ValidJSON(c, &body) {
 		return
 	}
 
 	var user model.User
 	if r.Db.Where("email = ?", body.Email).First(&user).RecordNotFound() {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrInvalidLogin))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrInvalidLogin))
 		return
 	}
 
 	if user.Password == "" {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrInvalidLogin))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrInvalidLogin))
 		return
 	}
 
@@ -40,19 +40,19 @@ func (r Router) LoginEndpoint(c *gin.Context) {
 
 	// Get the salt value
 	if err != nil {
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	// Compare the two password hashes
 	if hashPassword(body.Password, salt) != password {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrInvalidLogin))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrInvalidLogin))
 		return
 	}
 
 	userToken, err := createUserToken(r.Db, &user)
 	if err != nil {
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 

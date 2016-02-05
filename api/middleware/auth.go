@@ -1,9 +1,9 @@
-package auth
+package middleware
 
 import (
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/model"
 	"time"
 
@@ -25,7 +25,7 @@ func AuthenticationMiddleware(db *gorm.DB) gin.HandlerFunc {
 		token := c.Request.Header.Get(UserTokenHeader)
 		userUUID := c.Request.Header.Get(UserIDHeader)
 		if token == "" || userUUID == "" {
-			c.JSON(http.StatusUnauthorized, routing.RenderError(errs.ErrMissingHeaders))
+			c.JSON(http.StatusUnauthorized, controller.RenderError(errs.ErrMissingHeaders))
 			c.Abort()
 			return
 		}
@@ -33,7 +33,7 @@ func AuthenticationMiddleware(db *gorm.DB) gin.HandlerFunc {
 		// Check for valid token for the given user
 		userID, err := authenticate(db, token, userUUID)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, routing.RenderError(err))
+			c.JSON(http.StatusUnauthorized, controller.RenderError(err))
 			c.Abort()
 			return
 		}

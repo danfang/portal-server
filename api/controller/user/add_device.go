@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
 
@@ -30,7 +30,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 
 	var body addDevice
-	if !routing.ValidJSON(c, &body) {
+	if !controller.ValidJSON(c, &body) {
 		return
 	}
 
@@ -40,14 +40,14 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	if tx.Model(model.Device{}).Where(model.Device{
 		RegistrationID: body.RegistrationID,
 	}).Count(&count); count >= 1 {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrDuplicateDeviceToken))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrDuplicateDeviceToken))
 		return
 	}
 
 	device, err := createDevice(tx, userID, &body)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
@@ -56,7 +56,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	notificationKey, err := createNotificationKey(tx, gcmClient, userID, device.RegistrationID)
 	if err, isGCMError := err.(errs.GCMError); isGCMError {
 		tx.Rollback()
-		c.JSON(http.StatusBadRequest, routing.DetailError{
+		c.JSON(http.StatusBadRequest, controller.DetailError{
 			Error:  errs.ErrUnableToRegisterDevice.Error(),
 			Reason: err.Error(),
 		})
@@ -64,14 +64,14 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	}
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	encryptionKey, err := getEncryptionKey(tx, userID)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 

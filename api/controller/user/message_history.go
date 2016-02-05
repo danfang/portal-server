@@ -2,7 +2,7 @@ package user
 
 import (
 	"net/http"
-	"portal-server/api/routing"
+	"portal-server/api/controller"
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +29,7 @@ func (r Router) GetMessageHistoryEndpoint(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 	messages, err := getMessages(r.Db, userID)
 	if err != nil {
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 	messageBodies := make([]messageBody, 0, len(messages))

@@ -2,7 +2,7 @@ package user
 
 import (
 	"net/http"
-	"portal-server/api/routing"
+	"portal-server/api/controller"
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +25,7 @@ func (r Router) GetDevicesEndpoint(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 	devices, err := getLinkedDevices(r.Db, userID)
 	if err != nil {
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 	linkedDevices := make([]linkedDevice, 0, len(devices))

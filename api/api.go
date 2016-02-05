@@ -2,9 +2,9 @@ package main
 
 import (
 	"net/http"
-	"portal-server/api/auth"
-	"portal-server/api/routing/access"
-	"portal-server/api/routing/user"
+	"portal-server/api/controller/access"
+	"portal-server/api/controller/user"
+	"portal-server/api/middleware"
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func API(db *gorm.DB) *gin.Engine {
 	httpClient := http.DefaultClient
 
 	r := gin.Default()
-	r.Use(auth.CORSMiddleware())
+	r.Use(middleware.CORSMiddleware())
 
 	// Add swagger.json file
 	r.StaticFile("/swagger.json", "./api/swagger.json")
@@ -39,7 +39,7 @@ func API(db *gorm.DB) *gin.Engine {
 		}
 
 		userGroup := v1.Group("/user")
-		userGroup.Use(auth.AuthenticationMiddleware(db))
+		userGroup.Use(middleware.AuthenticationMiddleware(db))
 		{
 			userRouter := user.Router{Db: db, HTTPClient: httpClient}
 			userGroup.POST("/devices", userRouter.AddDeviceEndpoint)

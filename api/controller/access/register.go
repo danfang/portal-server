@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/model"
 	"time"
 
@@ -30,34 +30,34 @@ type passwordRegistration struct {
 // email and password.
 func (r Router) RegisterEndpoint(c *gin.Context) {
 	var body passwordRegistration
-	if !routing.ValidJSON(c, &body) {
+	if !controller.ValidJSON(c, &body) {
 		return
 	}
 	tx := r.Db.Begin()
 
 	var count int
 	if r.Db.Model(model.User{}).Where(model.User{Email: body.Email}).Count(&count); count >= 1 {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrDuplicateEmail))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrDuplicateEmail))
 		return
 	}
 
 	user, err := createDefaultUser(tx, &body)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	token, err := createVerificationToken(tx, user)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	tx.Commit()
 	sendTokenToUser(user.Email, token)
-	c.JSON(http.StatusOK, routing.RenderSuccess())
+	c.JSON(http.StatusOK, controller.RenderSuccess())
 }
 
 func createDefaultUser(db *gorm.DB, body *passwordRegistration) (*model.User, error) {

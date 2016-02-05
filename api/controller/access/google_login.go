@@ -2,8 +2,8 @@ package access
 
 import (
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
 
@@ -21,7 +21,7 @@ type googleLogin struct {
 // GoogleLoginEndpoint handles a POST request to login or register with a Google account.
 func (r Router) GoogleLoginEndpoint(c *gin.Context) {
 	var body googleLogin
-	if !routing.ValidJSON(c, &body) {
+	if !controller.ValidJSON(c, &body) {
 		return
 	}
 
@@ -33,18 +33,18 @@ func (r Router) GoogleLoginEndpoint(c *gin.Context) {
 	googleUser, err := util.GetGoogleUser(client, body.IDToken)
 	switch {
 	case err == errs.ErrInvalidGoogleIDToken:
-		c.JSON(http.StatusBadRequest, routing.RenderError(err))
+		c.JSON(http.StatusBadRequest, controller.RenderError(err))
 		return
 	case err == errs.ErrGoogleOAuthUnavailable:
-		c.JSON(http.StatusInternalServerError, routing.RenderError(err))
+		c.JSON(http.StatusInternalServerError, controller.RenderError(err))
 		return
 	case err != nil:
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	if googleUser.EmailVerified == "false" {
-		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrGoogleAccountNotVerified))
+		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrGoogleAccountNotVerified))
 		return
 	}
 
@@ -52,14 +52,14 @@ func (r Router) GoogleLoginEndpoint(c *gin.Context) {
 	user, err := createLinkedGoogleAccount(tx, googleUser)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 
 	userToken, err := createUserToken(tx, user)
 	if err != nil {
 		tx.Rollback()
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
 

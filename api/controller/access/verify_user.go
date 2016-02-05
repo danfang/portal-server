@@ -2,8 +2,8 @@ package access
 
 import (
 	"net/http"
+	"portal-server/api/controller"
 	"portal-server/api/errs"
-	"portal-server/api/routing"
 	"portal-server/model"
 	"time"
 
@@ -20,15 +20,15 @@ type VerificationToken struct {
 func (r Router) VerifyUserEndpoint(c *gin.Context) {
 	user, err := checkVerificationToken(r.Db, c.Param("token"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, routing.RenderError(err))
+		c.JSON(http.StatusBadRequest, controller.RenderError(err))
 		return
 	}
 	user.Verified = true
 	if err := r.Db.Save(&user).Error; err != nil {
-		routing.InternalServiceError(c, err)
+		controller.InternalServiceError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, routing.RenderSuccess())
+	c.JSON(http.StatusOK, controller.RenderSuccess())
 }
 
 func checkVerificationToken(db *gorm.DB, param string) (*model.User, error) {

@@ -29,7 +29,7 @@ func main() {
 	}
 
 	fmt.Println("Connecting to db: ", dbName)
-	db := model.GetDB(dbUser, dbName, dbPassword)
+	db := model.GetStore(dbUser, dbName, dbPassword)
 	db.LogMode(true)
 
 	switch args[0] {

@@ -22,19 +22,19 @@ func init() {
 }
 
 func TestCreateDevice(t *testing.T) {
-	user := &model.User{
+	user := model.User{
 		Email:    "test@portal.com",
 		Verified: true,
 	}
 
-	addDeviceDB.Create(user)
+	addDeviceDB.Create(&user)
 
 	body := &addDevice{
 		RegistrationID: "a_token",
 		Type:           model.DeviceTypePhone,
 	}
 
-	device, err := createDevice(&addDeviceDB, user, body)
+	device, err := createDevice(&addDeviceDB, user.ID, body)
 	assert.NoError(t, err)
 	assert.Equal(t, "a_token", device.RegistrationID)
 	assert.Equal(t, model.DeviceTypePhone, device.Type)
@@ -47,15 +47,13 @@ func TestCreateDevice(t *testing.T) {
 	assert.Equal(t, user.Verified, fromDB.Verified)
 
 	// Cannot create duplicate devices for the same user
-	_, err = createDevice(&addDeviceDB, user, body)
+	_, err = createDevice(&addDeviceDB, user.ID, body)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "UNIQUE")
 
 	// Cannot create duplicate devices for other users
-	otherUser := &model.User{
-		Email: "abc@def.com",
-	}
-	_, err = createDevice(&addDeviceDB, otherUser, body)
+	otherUserID := uint(5)
+	_, err = createDevice(&addDeviceDB, otherUserID, body)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "UNIQUE")
 }
@@ -73,7 +71,7 @@ func TestCreateNotificationKey(t *testing.T) {
 	}
 	server, client := util.TestHTTP(requestTest, 200, string(mockResponse))
 	defer server.Close()
-	key, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key, err := createNotificationKey(&addDeviceDB, client, user.ID, "registrationId")
 	assert.NoError(t, err)
 	assert.Regexp(t, "^[a-fA-F0-9]+$", key.GroupName)
 	assert.Equal(t, notificationKey, key.Key)
@@ -99,7 +97,7 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 		assert.Contains(t, string(body), "create")
 	}
 	server, client := util.TestHTTP(requestTest, 200, string(mockResponse))
-	key1, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key1, err := createNotificationKey(&addDeviceDB, client, user.ID, "registrationId")
 	assert.NoError(t, err)
 	assert.Equal(t, notificationKey, key1.Key)
 	server.Close()
@@ -110,7 +108,7 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 		assert.Contains(t, string(body), "add")
 	}
 	server, client = util.TestHTTP(requestTest, 200, string(mockResponse))
-	key2, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key2, err := createNotificationKey(&addDeviceDB, client, user.ID, "registrationId")
 
 	// Make sure the keys are the same
 	assert.NoError(t, err)
@@ -130,7 +128,7 @@ func TestGetEncryptionKey(t *testing.T) {
 	addDeviceDB.Create(&user)
 
 	// Create the key
-	key1, err := getEncryptionKey(&addDeviceDB, &user)
+	key1, err := getEncryptionKey(&addDeviceDB, user.ID)
 	assert.NoError(t, err)
 	assert.Regexp(t, "^[a-fA-F0-9]{64}$", key1.Key)
 
@@ -140,7 +138,7 @@ func TestGetEncryptionKey(t *testing.T) {
 	assert.Equal(t, user.Email, fromDB.Email)
 
 	// Attempt to create a duplicate key
-	key2, err := getEncryptionKey(&addDeviceDB, &user)
+	key2, err := getEncryptionKey(&addDeviceDB, user.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, key1.Key, key2.Key)
 

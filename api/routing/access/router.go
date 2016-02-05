@@ -3,11 +3,11 @@ package access
 import (
 	"net/http"
 
-	"portal-server/store"
+	"github.com/jinzhu/gorm"
 )
 
 // Router handles access routes for user creation and authentication.
 type Router struct {
-	Store      store.Store
+	Db         *gorm.DB
 	HTTPClient *http.Client
 }

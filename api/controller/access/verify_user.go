@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"portal-server/store"
 )
 
 type VerificationToken struct {
@@ -18,39 +18,44 @@ type VerificationToken struct {
 // VerifyUserEndpoint handles a GET request that consumes a user's verification token
 // for users who registered with an email and password.
 func (r Router) VerifyUserEndpoint(c *gin.Context) {
-	user, err := checkVerificationToken(r.Db, c.Param("token"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, controller.RenderError(err))
-		return
-	}
-	user.Verified = true
-	if err := r.Db.Save(&user).Error; err != nil {
-		controller.InternalServiceError(c, err)
-		return
-	}
+	r.Store.Transaction(func(tx store.Store) error {
+		user, err := checkVerificationToken(tx, c.Param("token"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, controller.RenderError(err))
+			return err
+		}
+		user.Verified = true
+		if err := tx.Users().SaveUser(user); err != nil {
+			controller.InternalServiceError(c, err)
+			return err
+		}
+		return nil
+	})
 	c.JSON(http.StatusOK, controller.RenderSuccess())
 }
 
-func checkVerificationToken(db *gorm.DB, param string) (*model.User, error) {
-	var token model.VerificationToken
+func checkVerificationToken(store store.Store, param string) (*model.User, error) {
+	token, found := store.VerificationTokens().FindToken(&model.VerificationToken{
+		Token: param,
+	})
 
-	// Check for existing token
-	if db.Where(model.VerificationToken{Token: param}).First(&token).RecordNotFound() {
+	if !found {
 		return nil, errs.ErrInvalidVerificationToken
 	}
 
-	defer db.Delete(&token)
-
 	// Expired token
 	if time.Now().After(token.ExpiresAt) {
+		store.VerificationTokens().DeleteToken(token)
 		return nil, errs.ErrExpiredVerificationToken
 	}
 
 	// Check for existing user account
-	var user model.User
-	if err := db.Model(&token).Related(&user).Error; err != nil {
+	user, err := store.VerificationTokens().GetRelatedUser(token)
+	if err != nil {
+		store.VerificationTokens().DeleteToken(token)
 		return nil, errs.ErrInvalidVerificationToken
 	}
 
-	return &user, nil
+	store.VerificationTokens().DeleteToken(token)
+	return user, nil
 }

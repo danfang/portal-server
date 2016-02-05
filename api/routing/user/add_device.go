@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
-	"portal-server/api/controller"
 	"portal-server/api/errs"
+	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
 
@@ -27,10 +27,10 @@ type addDeviceResponse struct {
 }
 
 func (r Router) AddDeviceEndpoint(c *gin.Context) {
-	user := c.MustGet("userID").(*model.User)
+	userID := c.MustGet("userID").(uint)
 
 	var body addDevice
-	if !controller.ValidJSON(c, &body) {
+	if !routing.ValidJSON(c, &body) {
 		return
 	}
 
@@ -40,23 +40,23 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	if tx.Model(model.Device{}).Where(model.Device{
 		RegistrationID: body.RegistrationID,
 	}).Count(&count); count >= 1 {
-		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrDuplicateDeviceToken))
+		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrDuplicateDeviceToken))
 		return
 	}
 
-	device, err := createDevice(tx, user, &body)
+	device, err := createDevice(tx, userID, &body)
 	if err != nil {
 		tx.Rollback()
-		controller.InternalServiceError(c, err)
+		routing.InternalServiceError(c, err)
 		return
 	}
 
 	gcmClient := &util.WebClient{BaseURL: gcmEndpoint, HTTPClient: r.HTTPClient}
 
-	notificationKey, err := createNotificationKey(tx, gcmClient, user, device.RegistrationID)
+	notificationKey, err := createNotificationKey(tx, gcmClient, userID, device.RegistrationID)
 	if err, isGCMError := err.(errs.GCMError); isGCMError {
 		tx.Rollback()
-		c.JSON(http.StatusBadRequest, controller.DetailError{
+		c.JSON(http.StatusBadRequest, routing.DetailError{
 			Error:  errs.ErrUnableToRegisterDevice.Error(),
 			Reason: err.Error(),
 		})
@@ -64,14 +64,14 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	}
 	if err != nil {
 		tx.Rollback()
-		controller.InternalServiceError(c, err)
+		routing.InternalServiceError(c, err)
 		return
 	}
 
-	encryptionKey, err := getEncryptionKey(tx, user)
+	encryptionKey, err := getEncryptionKey(tx, userID)
 	if err != nil {
 		tx.Rollback()
-		controller.InternalServiceError(c, err)
+		routing.InternalServiceError(c, err)
 		return
 	}
 
@@ -82,9 +82,9 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	})
 }
 
-func createDevice(db *gorm.DB, user *model.User, body *addDevice) (*model.Device, error) {
+func createDevice(db *gorm.DB, userID uint, body *addDevice) (*model.Device, error) {
 	device := model.Device{
-		User:           *user,
+		UserID:         userID,
 		RegistrationID: body.RegistrationID,
 		Name:           body.Name,
 		Type:           body.Type,
@@ -96,11 +96,11 @@ func createDevice(db *gorm.DB, user *model.User, body *addDevice) (*model.Device
 	return &device, nil
 }
 
-func createNotificationKey(db *gorm.DB, gc *util.WebClient, user *model.User, registrationID string) (*model.NotificationKey, error) {
+func createNotificationKey(db *gorm.DB, gc *util.WebClient, userID uint, registrationID string) (*model.NotificationKey, error) {
 	var notificationKey model.NotificationKey
 
 	// If no notification key exists: create and register with GCM
-	if db.Where(model.NotificationKey{User: *user}).First(&notificationKey).RecordNotFound() {
+	if db.Where(model.NotificationKey{UserID: userID}).First(&notificationKey).RecordNotFound() {
 		bytes := make([]byte, 48)
 		if _, err := rand.Read(bytes); err != nil {
 			return nil, err
@@ -112,7 +112,7 @@ func createNotificationKey(db *gorm.DB, gc *util.WebClient, user *model.User, re
 		}
 
 		notificationKey = model.NotificationKey{
-			User:      *user,
+			UserID:    userID,
 			Key:       key,
 			GroupName: groupName,
 		}
@@ -131,16 +131,16 @@ func createNotificationKey(db *gorm.DB, gc *util.WebClient, user *model.User, re
 	return &notificationKey, nil
 }
 
-func getEncryptionKey(db *gorm.DB, user *model.User) (*model.EncryptionKey, error) {
+func getEncryptionKey(db *gorm.DB, userID uint) (*model.EncryptionKey, error) {
 	var encryptionKey model.EncryptionKey
-	if db.Where(model.EncryptionKey{User: *user}).First(&encryptionKey).RecordNotFound() {
+	if db.Where(model.EncryptionKey{UserID: userID}).First(&encryptionKey).RecordNotFound() {
 		key := make([]byte, 32)
 		if _, err := rand.Read(key); err != nil {
 			return nil, err
 		}
 		encryptionKey = model.EncryptionKey{
-			User: *user,
-			Key:  hex.EncodeToString(key),
+			UserID: userID,
+			Key:    hex.EncodeToString(key),
 		}
 		if err := db.Create(&encryptionKey).Error; err != nil {
 			return nil, err

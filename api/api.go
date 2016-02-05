@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"portal-server/store"
 )
 
 const (
@@ -18,9 +19,7 @@ const (
 )
 
 // API returns a Gin router based on a given database.
-func API(db *gorm.DB) *gin.Engine {
-	httpClient := http.DefaultClient
-
+func API(store store.Store, httpClient *http.Client) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 
@@ -31,7 +30,7 @@ func API(db *gorm.DB) *gin.Engine {
 	{
 		accessGroup := v1.Group("/")
 		{
-			accessRouter := access.Router{Db: db, HTTPClient: httpClient}
+			accessRouter := access.Router{Store: store, HTTPClient: httpClient}
 			accessGroup.POST("/register", accessRouter.RegisterEndpoint)
 			accessGroup.POST("/login", accessRouter.LoginEndpoint)
 			accessGroup.POST("/login/google", accessRouter.GoogleLoginEndpoint)
@@ -39,9 +38,9 @@ func API(db *gorm.DB) *gin.Engine {
 		}
 
 		userGroup := v1.Group("/user")
-		userGroup.Use(middleware.AuthenticationMiddleware(db))
+		userGroup.Use(middleware.AuthenticationMiddleware(store))
 		{
-			userRouter := user.Router{Db: db, HTTPClient: httpClient}
+			userRouter := user.Router{Store: store, HTTPClient: httpClient}
 			userGroup.POST("/devices", userRouter.AddDeviceEndpoint)
 			userGroup.GET("/devices", userRouter.GetDevicesEndpoint)
 			userGroup.GET("/messages/history", userRouter.GetMessageHistoryEndpoint)
@@ -51,6 +50,7 @@ func API(db *gorm.DB) *gin.Engine {
 }
 
 func main() {
-	db := model.GetDB(dbUser, dbName, dbPassword)
-	API(db).Run(":8080")
+	store := store.GetStore(dbUser, dbName, dbPassword)
+	httpClient := http.DefaultClient
+	API(store, httpClient).Run(":8080")
 }

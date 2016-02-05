@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"portal-server/store"
 )
 
 // Headers for user authentication
@@ -19,7 +19,7 @@ const (
 
 // AuthenticationMiddleware handles authentication for protected user
 // endpoints by checking for valid user id and user token headers.
-func AuthenticationMiddleware(db *gorm.DB) gin.HandlerFunc {
+func AuthenticationMiddleware(store store.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check for valid headers
 		token := c.Request.Header.Get(UserTokenHeader)
@@ -31,40 +31,40 @@ func AuthenticationMiddleware(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Check for valid token for the given user
-		userID, err := authenticate(db, token, userUUID)
+		user, err := authenticate(store, token, userUUID)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, controller.RenderError(err))
 			c.Abort()
 			return
 		}
 
-		c.Set("userID", userID)
+		c.Set("userID", user)
 		c.Next()
 	}
 }
 
-func authenticate(db *gorm.DB, token, userUUID string) (uint, error) {
-	var userToken model.UserToken
-	var user model.User
+func authenticate(store store.Store, token, uuid string) (*model.User, error) {
 	// User not found
-	if db.Where(&model.User{UUID: userUUID}).First(&user).RecordNotFound() {
-		return 0, errs.ErrInvalidUserToken
+	user, found := store.Users().FindUser(&model.User{UUID: uuid})
+	if !found {
+		return nil, errs.ErrInvalidUserToken
 	}
 
 	// Token not found
-	if db.Where(&model.UserToken{Token: token, UserID: user.ID}).First(&userToken).RecordNotFound() {
-		return 0, errs.ErrInvalidUserToken
+	userToken, found := store.UserTokens().FindToken(&model.UserToken{Token: token, UserID: user.ID})
+	if !found {
+		return nil, errs.ErrInvalidUserToken
 	}
 
 	// Token expired
 	if !userToken.ExpiresAt.IsZero() && time.Now().After(userToken.ExpiresAt) {
-		db.Delete(&userToken)
-		return 0, errs.ErrInvalidUserToken
+		store.UserTokens().DeleteToken(userToken)
+		return nil, errs.ErrInvalidUserToken
 	}
 
-	// Acount not verified
+	// Account not verified
 	if !user.Verified {
-		return 0, errs.ErrAccountNotVerified
+		return nil, errs.ErrAccountNotVerified
 	}
-	return user.ID, nil
+	return user, nil
 }

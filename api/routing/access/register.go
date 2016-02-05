@@ -4,14 +4,14 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
-	"portal-server/api/controller"
 	"portal-server/api/errs"
+	"portal-server/api/routing"
 	"portal-server/model"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
-	"portal-server/store"
 )
 
 type PasswordRegistration struct {
@@ -30,46 +30,43 @@ type passwordRegistration struct {
 // email and password.
 func (r Router) RegisterEndpoint(c *gin.Context) {
 	var body passwordRegistration
-	if !controller.ValidJSON(c, &body) {
+	if !routing.ValidJSON(c, &body) {
+		return
+	}
+	tx := r.Db.Begin()
+
+	var count int
+	if r.Db.Model(model.User{}).Where(model.User{Email: body.Email}).Count(&count); count >= 1 {
+		c.JSON(http.StatusBadRequest, routing.RenderError(errs.ErrDuplicateEmail))
 		return
 	}
 
-	var user *model.User
-	var verificationToken string
-	r.Store.Transaction(func(tx store.Store) error {
-		var err error
+	user, err := createDefaultUser(tx, &body)
+	if err != nil {
+		tx.Rollback()
+		routing.InternalServiceError(c, err)
+		return
+	}
 
-		// Check unique email
-		if tx.Users().UserCount(&model.User{Email: body.Email}) >= 1 {
-			err = errs.ErrDuplicateEmail
-			c.JSON(http.StatusBadRequest, controller.RenderError(err))
-			return err
-		}
+	token, err := createVerificationToken(tx, user)
+	if err != nil {
+		tx.Rollback()
+		routing.InternalServiceError(c, err)
+		return
+	}
 
-		user, err = createDefaultUser(tx, &body)
-		if err != nil {
-			controller.InternalServiceError(c, err)
-			return err
-		}
-
-		verificationToken, err = createVerificationToken(tx, user)
-		if err != nil {
-			controller.InternalServiceError(c, err)
-			return err
-		}
-		return nil
-	})
-	sendTokenToUser(user.Email, verificationToken)
-	c.JSON(http.StatusOK, controller.RenderSuccess())
+	tx.Commit()
+	sendTokenToUser(user.Email, token)
+	c.JSON(http.StatusOK, routing.RenderSuccess())
 }
 
-func createDefaultUser(store store.Store, body *passwordRegistration) (*model.User, error) {
+func createDefaultUser(db *gorm.DB, body *passwordRegistration) (*model.User, error) {
 	salt := make([]byte, 32)
 	if _, err := rand.Read(salt); err != nil {
 		return nil, err
 	}
 	password := hashPassword(body.Password, salt)
-	user := &model.User{
+	user := model.User{
 		UUID:        uuid.NewV4().String(),
 		FirstName:   body.FirstName,
 		LastName:    body.LastName,
@@ -78,23 +75,23 @@ func createDefaultUser(store store.Store, body *passwordRegistration) (*model.Us
 		Verified:    false,
 		PhoneNumber: body.PhoneNumber,
 	}
-	if err := store.Users().CreateUser(user); err != nil {
+	if err := db.Create(&user).Error; err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
-func createVerificationToken(store store.Store, user *model.User) (string, error) {
+func createVerificationToken(db *gorm.DB, user *model.User) (string, error) {
 	token := make([]byte, 32)
 	if _, err := rand.Read(token); err != nil {
 		return "", err
 	}
-	newToken := &model.VerificationToken{
+	newToken := model.VerificationToken{
 		User:      *user,
 		ExpiresAt: time.Now().AddDate(0, 0, 1),
 		Token:     hex.EncodeToString(token),
 	}
-	if err := store.VerificationTokens().CreateToken(newToken); err != nil {
+	if err := db.Create(&newToken).Error; err != nil {
 		return "", err
 	}
 	return newToken.Token, nil

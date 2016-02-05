@@ -11,30 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// A PasswordLogin is a JSON structure for user logins via email and password.
-//
-// swagger:parameters login
-type PasswordLogin struct {
-	// in: body
-	// required: true
-	Body passwordLogin `json:"password_login"`
-}
-
 type passwordLogin struct {
-	// unique: true
-	// required: true
-	Email string `json:"email" valid:"required,email"`
-
-	// minimum length: 6
-	// maximum length: 50
-	// required: true
+	Email    string `json:"email" valid:"required,email"`
 	Password string `json:"password" valid:"required,length(6|50)"`
 }
 
 // LoginEndpoint handles a POST request for a user to login via email and password.
 func (r Router) LoginEndpoint(c *gin.Context) {
 	var body passwordLogin
-	if !routing.ValidateJSON(c, &body) {
+	if !routing.ValidJSON(c, &body) {
 		return
 	}
 

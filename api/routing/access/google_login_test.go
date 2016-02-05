@@ -8,7 +8,6 @@ import (
 	"portal-server/api/errs"
 	"portal-server/api/util"
 	"portal-server/model"
-	"portal-server/model/types"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -88,7 +87,7 @@ func TestGoogleLoginEndpoint_Valid(t *testing.T) {
 	var linkedAccount model.LinkedAccount
 	googleLoginDB.Where(model.LinkedAccount{
 		AccountID: "valid_user_sub",
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}).First(&linkedAccount)
 
 	assert.Equal(t, "valid_user_sub", linkedAccount.AccountID)
@@ -126,7 +125,7 @@ func TestGoogleLoginEndpoint_ExistingUser(t *testing.T) {
 	var linkedAccount model.LinkedAccount
 	googleLoginDB.Where(model.LinkedAccount{
 		AccountID: "existing_user_sub",
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}).First(&linkedAccount)
 
 	assert.Equal(t, "existing_user_sub", linkedAccount.AccountID)
@@ -151,7 +150,7 @@ func TestGoogleLoginEndpoint_ExistingUserAndGoogleAccount(t *testing.T) {
 	account := model.LinkedAccount{
 		User:      user,
 		AccountID: "existing_user_and_account_sub",
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}
 	googleLoginDB.Create(&account)
 	input := map[string]string{
@@ -172,7 +171,7 @@ func TestGoogleLoginEndpoint_ExistingUserAndGoogleAccount(t *testing.T) {
 	var linkedAccountCount int
 	googleLoginDB.Model(model.LinkedAccount{}).Where(model.LinkedAccount{
 		AccountID: "existing_user_and_account_sub",
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}).Count(&linkedAccountCount)
 
 	assert.Equal(t, 1, linkedAccountCount)
@@ -236,7 +235,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_NoLinkedAccount(t *testing.T) {
 	var linkedAccount model.LinkedAccount
 	googleLoginDB.Model(&user).Related(&linkedAccount)
 	assert.Equal(t, "12345", linkedAccount.AccountID)
-	assert.Equal(t, types.LinkedAccountTypeGoogle.String(), linkedAccount.Type)
+	assert.Equal(t, model.LinkedAccountTypeGoogle, linkedAccount.Type)
 }
 
 func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing.T) {
@@ -251,7 +250,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 	linkedAccount := model.LinkedAccount{
 		User:      original,
 		AccountID: googleAccountID,
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}
 
 	googleLoginDB.Create(&linkedAccount)
@@ -271,7 +270,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 	var count int
 	googleLoginDB.Model(&linkedAccount).Where(model.LinkedAccount{
 		AccountID: googleAccountID,
-		Type:      types.LinkedAccountTypeGoogle.String(),
+		Type:      model.LinkedAccountTypeGoogle,
 	}).Count(&count)
 	assert.Equal(t, 1, count)
 }

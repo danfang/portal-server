@@ -11,13 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// A VerificationToken is a token generated on account creation and emailed
-// to a given user.
-//
-// swagger:parameters verifyToken
 type VerificationToken struct {
-	// in: path
-	// required: true
 	Token string `json:"token"`
 }
 

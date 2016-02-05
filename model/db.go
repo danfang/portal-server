@@ -2,24 +2,31 @@ package model
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
+
+	"github.com/jinzhu/gorm"
 )
 
+var (
+	host = "localhost"
+	port = "5432"
+)
+
+func init() {
+	envHost := os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
+	envPort := os.Getenv("POSTGRES_PORT_5432_TCP_PORT")
+
+	if envHost != "" {
+		host = envHost
+	}
+
+	if port != "" {
+		port = envPort
+	}
+}
+
 func GetDB(dbUser, dbName, dbPassword string) *gorm.DB {
-	host := os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
-	port := os.Getenv("POSTGRES_PORT_5432_TCP_PORT")
-
-	if host == "" {
-		host = "localhost"
-	}
-
-	if port == "" {
-		port = "5432"
-	}
-
 	connStr := fmt.Sprintf("user=%s dbname=%s host=%s port=%s password=%s sslmode=disable",
 		dbUser, dbName, host, port, dbPassword)
 

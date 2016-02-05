@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/model"
-	"portal-server/model/types"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +38,7 @@ func TestGetMessagesEndpoint_AllMessages(t *testing.T) {
 		To:        "justin",
 		MessageID: "1",
 		Body:      "hello",
-		Status:    types.MessageStatusDelivered.String(),
+		Status:    model.MessageStatusDelivered,
 	}
 	getMessagesDB.Create(&message)
 	w := testGetMessages(user.ID)
@@ -66,7 +65,7 @@ func TestGetMessagesEndpoint_AllMessagesLimit(t *testing.T) {
 			To:        "myself",
 			MessageID: fmt.Sprintf("message%d", i),
 			Body:      "goodbye",
-			Status:    types.MessageStatusDelivered.String(),
+			Status:    model.MessageStatusDelivered,
 		})
 	}
 	w := testGetMessages(user.ID)

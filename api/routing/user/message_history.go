@@ -9,14 +9,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// MessageHistoryResponse contains user messages.
-//
-// swagger:response messageHistory
-type MessageHistoryResponse struct {
-	// in: body
-	Body messageHistoryResponse `json:"message_history"`
-}
-
 const messageHistoryLimit = 1000
 
 type messageHistoryResponse struct {

@@ -8,7 +8,6 @@ import (
 	"portal-server/api/routing"
 	"portal-server/api/util"
 	"portal-server/model"
-	"portal-server/model/types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -16,34 +15,10 @@ import (
 
 const gcmEndpoint = "https://android.googleapis.com/gcm/notification"
 
-// AddDeviceParam is a JSON structure for registering a GCM device.
-//
-// swagger:parameters addDevice
-type AddDeviceParam struct {
-	// in: body
-	// required: true
-	Body addDeviceParam `json:"add_device"`
-}
-
-type addDeviceParam struct {
-	// required: true
+type addDevice struct {
 	RegistrationID string `json:"registration_id" valid:"required"`
-
-	// required: true
-	Name string `json:"name" valid:"required"`
-
-	// required: true
-	// pattern: (phone,chrome,desktop)
-	Type types.DeviceType `json:"type" valid:"required,matches(phone,chrome,desktop)"`
-}
-
-// AddDeviceResponse contains the encryption and
-// notifica†ion keys for a new GCM client.
-//
-// swagger:response addDeviceResponse
-type AddDeviceResponse struct {
-	// in: body
-	Body addDeviceResponse `json:"add_device"`
+	Name           string `json:"name" valid:"required"`
+	Type           string `json:"type" valid:"required,matches(phone,chrome,desktop)"`
 }
 
 type addDeviceResponse struct {
@@ -51,13 +26,11 @@ type addDeviceResponse struct {
 	NotificationKey string `json:"notification_key"`
 }
 
-// AddDeviceEndpoint handles a POST request to register or add a new
-// messaging device.
 func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 
-	var body addDeviceParam
-	if !routing.ValidateJSON(c, &body) {
+	var body addDevice
+	if !routing.ValidJSON(c, &body) {
 		return
 	}
 
@@ -109,13 +82,13 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 	})
 }
 
-func createDevice(db *gorm.DB, userID uint, body *addDeviceParam) (*model.Device, error) {
+func createDevice(db *gorm.DB, userID uint, body *addDevice) (*model.Device, error) {
 	device := model.Device{
 		UserID:         userID,
 		RegistrationID: body.RegistrationID,
 		Name:           body.Name,
-		Type:           body.Type.String(),
-		State:          types.DeviceStateLinked.String(),
+		Type:           body.Type,
+		State:          model.DeviceStateLinked,
 	}
 	if err := db.Create(&device).Error; err != nil {
 		return nil, err

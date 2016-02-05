@@ -4,19 +4,10 @@ import (
 	"net/http"
 	"portal-server/api/routing"
 	"portal-server/model"
-	"portal-server/model/types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
-
-// DeviceListResponse contains existing, connected user devices.
-//
-// swagger:response deviceList
-type DeviceListResponse struct {
-	// in: body
-	Body deviceListResponse `json:"device_list"`
-}
 
 type deviceListResponse struct {
 	Devices []linkedDevice `json:"devices"`
@@ -55,7 +46,7 @@ func getLinkedDevices(db *gorm.DB, userID uint) ([]model.Device, error) {
 	var devices []model.Device
 	if err := db.Where(model.Device{
 		UserID: userID,
-		State:  types.DeviceStateLinked.String(),
+		State:  model.DeviceStateLinked,
 	}).Find(&devices).Error; err != nil {
 		return nil, err
 	}

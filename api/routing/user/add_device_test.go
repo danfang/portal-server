@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"portal-server/api/util"
 	"portal-server/model"
-	"portal-server/model/types"
 	"testing"
 
 	"github.com/jinzhu/gorm"
@@ -30,16 +29,16 @@ func TestCreateDevice(t *testing.T) {
 
 	addDeviceDB.Create(&user)
 
-	body := &addDeviceParam{
+	body := &addDevice{
 		RegistrationID: "a_token",
-		Type:           types.DeviceTypePhone,
+		Type:           model.DeviceTypePhone,
 	}
 
 	device, err := createDevice(&addDeviceDB, user.ID, body)
 	assert.NoError(t, err)
 	assert.Equal(t, "a_token", device.RegistrationID)
-	assert.Equal(t, types.DeviceTypePhone.String(), device.Type)
-	assert.Equal(t, types.DeviceStateLinked.String(), device.State)
+	assert.Equal(t, model.DeviceTypePhone, device.Type)
+	assert.Equal(t, model.DeviceStateLinked, device.State)
 
 	var fromDB model.User
 	addDeviceDB.Model(device).Related(&fromDB)

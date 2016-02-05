@@ -27,7 +27,7 @@ func init() {
 	validator = gin.New()
 	validator.GET("/", func(c *gin.Context) {
 		var json testJSON
-		if !ValidateJSON(c, &json) {
+		if !ValidJSON(c, &json) {
 			return
 		}
 		c.String(http.StatusOK, validatorResponse)

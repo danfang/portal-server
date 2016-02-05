@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/model"
-	"portal-server/model/types"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -41,21 +40,21 @@ func TestGetDevicesEndpoint_LinkedDevices(t *testing.T) {
 		Name:           "Nexus 6P",
 		Type:           "phone",
 		RegistrationID: "1",
-		State:          types.DeviceStateLinked.String(),
+		State:          model.DeviceStateLinked,
 	})
 	getDevicesDB.Create(&model.Device{
 		User:           user,
 		Name:           "Chrome 4.2",
 		Type:           "chrome",
 		RegistrationID: "2",
-		State:          types.DeviceStateLinked.String(),
+		State:          model.DeviceStateLinked,
 	})
 	getDevicesDB.Create(&model.Device{
 		User:           user,
 		Name:           "Unlinked Desktop",
 		Type:           "desktop",
 		RegistrationID: "3",
-		State:          types.DeviceStateUnlinked.String(),
+		State:          model.DeviceStateUnlinked,
 	})
 	w := testGetDevices(user.ID)
 	assert.Equal(t, 200, w.Code)

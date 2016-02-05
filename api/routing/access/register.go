@@ -14,37 +14,15 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// A PasswordRegistration is a JSON structure for user registration.
-// via email and password.
-//
-// swagger:parameters register
 type PasswordRegistration struct {
-	// in: body
-	// required: true
 	Body passwordRegistration `json:"password_registration"`
 }
 
 type passwordRegistration struct {
-	// unique: true
-	// required: true
-	Email string `json:"email" valid:"required,email"`
-
-	// minimum length: 6
-	// maximum length: 50
-	// required: true
-	Password string `json:"password" valid:"required,length(6|50)"`
-
-	// minimum length: 1
-	// maximum length: 20
-	// required: true
-	FirstName string `json:"first_name" valid:"length(1|20)"`
-
-	// minimum length: 1
-	// maximum length: 20
-	// required: true
-	LastName string `json:"last_name" valid:"length(1|20)"`
-
-	// pattern: ^\+[0-9]{10,12}$
+	Email       string `json:"email" valid:"required,email"`
+	Password    string `json:"password" valid:"required,length(6|50)"`
+	FirstName   string `json:"first_name" valid:"length(1|20)"`
+	LastName    string `json:"last_name" valid:"length(1|20)"`
 	PhoneNumber string `json:"phone_number" valid:"matches(^\+[0-9]{10,12}$)"`
 }
 
@@ -52,7 +30,7 @@ type passwordRegistration struct {
 // email and password.
 func (r Router) RegisterEndpoint(c *gin.Context) {
 	var body passwordRegistration
-	if !routing.ValidateJSON(c, &body) {
+	if !routing.ValidJSON(c, &body) {
 		return
 	}
 	tx := r.Db.Begin()

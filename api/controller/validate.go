@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ValidateJSON writes a response if there are JSON marshalling
+// ValidJSON writes a response if there are JSON marshalling
 // or JSON validation errors. Returns true if given JSON is valid.
 func ValidJSON(c *gin.Context, json interface{}) bool {
 	if err := c.BindJSON(json); err != nil {

@@ -12,7 +12,7 @@ import (
 	"portal-server/store"
 )
 
-type VerificationToken struct {
+type verificationToken struct {
 	Token string `json:"token"`
 }
 

@@ -5,6 +5,9 @@ import (
 	"log"
 )
 
+// A Store represents all the data models and their respective interfaces,
+// allowing CRUD operations on the database without needing to worry about
+// the ORM.
 type Store interface {
 	Transaction(t func(txStore Store) error)
 	Users() UserStore

@@ -15,10 +15,6 @@ import (
 	"portal-server/store"
 )
 
-type PasswordRegistration struct {
-	Body passwordRegistration `json:"password_registration"`
-}
-
 type passwordRegistration struct {
 	Email       string `json:"email" valid:"required,email"`
 	Password    string `json:"password" valid:"required,length(6|50)"`

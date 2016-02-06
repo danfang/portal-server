@@ -27,6 +27,8 @@ type addDeviceResponse struct {
 	NotificationKey string `json:"notification_key"`
 }
 
+// AddDeviceEndpoint allows users to register new GCM devices, which returns encryption
+// and notification keys on success.
 func AddDeviceEndpoint(c *gin.Context) {
 	var body addDevice
 	if !controller.ValidJSON(c, &body) {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 	"portal-server/store"
 )
 
@@ -19,7 +20,7 @@ const (
 
 // AuthenticationMiddleware handles authentication for protected user
 // endpoints by checking for valid user id and user token headers.
-func AuthenticationMiddleware(store store.Store) gin.HandlerFunc {
+func AuthenticationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check for valid headers
 		token := c.Request.Header.Get(UserTokenHeader)
@@ -31,6 +32,7 @@ func AuthenticationMiddleware(store store.Store) gin.HandlerFunc {
 		}
 
 		// Check for valid token for the given user
+		store := context.StoreFromContext(c)
 		user, err := authenticate(store, token, userUUID)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, controller.RenderError(err))
@@ -38,7 +40,7 @@ func AuthenticationMiddleware(store store.Store) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("user", user)
+		context.UserToContext(c, user)
 		c.Next()
 	}
 }

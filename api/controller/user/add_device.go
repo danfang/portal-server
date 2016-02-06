@@ -10,6 +10,7 @@ import (
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 	"portal-server/store"
 )
 
@@ -26,29 +27,31 @@ type addDeviceResponse struct {
 	NotificationKey string `json:"notification_key"`
 }
 
-func (r Router) AddDeviceEndpoint(c *gin.Context) {
-	user := c.MustGet("user").(*model.User)
-
+func AddDeviceEndpoint(c *gin.Context) {
 	var body addDevice
 	if !controller.ValidJSON(c, &body) {
 		return
 	}
-	gcmClient := &util.WebClient{BaseURL: gcmEndpoint, HTTPClient: r.HTTPClient}
-	r.Store.Transaction(func(tx store.Store) error {
+
+	user := context.UserFromContext(c)
+	wc := context.WebClientFromContext(c, gcmEndpoint)
+
+	s := context.StoreFromContext(c)
+	s.Transaction(func(store store.Store) error {
 		var err error
-		if tx.Devices().DeviceCount(&model.Device{RegistrationID: body.RegistrationID}) >= 1 {
+		if store.Devices().DeviceCount(&model.Device{RegistrationID: body.RegistrationID}) >= 1 {
 			err = errs.ErrDuplicateDeviceToken
 			c.JSON(http.StatusBadRequest, controller.RenderError(err))
 			return err
 		}
 
-		device, err := createDevice(tx, user, &body)
+		device, err := createDevice(store, user, &body)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err
 		}
 
-		notificationKey, err := createNotificationKey(tx, gcmClient, user, device.RegistrationID)
+		notificationKey, err := createNotificationKey(store, wc, user, device.RegistrationID)
 		if err, isGCMError := err.(errs.GCMError); isGCMError {
 			c.JSON(http.StatusBadRequest, controller.DetailError{
 				Error:  errs.ErrUnableToRegisterDevice.Error(),
@@ -62,7 +65,7 @@ func (r Router) AddDeviceEndpoint(c *gin.Context) {
 			return err
 		}
 
-		encryptionKey, err := getEncryptionKey(tx, user)
+		encryptionKey, err := getEncryptionKey(store, user)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err
@@ -89,7 +92,7 @@ func createDevice(store store.Store, user *model.User, body *addDevice) (*model.
 	return device, nil
 }
 
-func createNotificationKey(store store.Store, gc *util.WebClient, user *model.User, registrationID string) (*model.NotificationKey, error) {
+func createNotificationKey(store store.Store, wc *util.WebClient, user *model.User, registrationID string) (*model.NotificationKey, error) {
 	notificationKey, found := store.NotificationKeys().FindKey(&model.NotificationKey{
 		UserID: user.ID,
 	})
@@ -102,7 +105,7 @@ func createNotificationKey(store store.Store, gc *util.WebClient, user *model.Us
 		}
 
 		groupName := hex.EncodeToString(bytes)
-		key, err := util.CreateNotificationGroup(gc, groupName, registrationID)
+		key, err := util.CreateNotificationGroup(wc, groupName, registrationID)
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +123,7 @@ func createNotificationKey(store store.Store, gc *util.WebClient, user *model.Us
 	}
 
 	// If notification key exists: add device to notification group
-	err := util.AddNotificationGroup(gc, notificationKey.GroupName, notificationKey.Key, registrationID)
+	err := util.AddNotificationGroup(wc, notificationKey.GroupName, notificationKey.Key, registrationID)
 	if err != nil {
 		return nil, err
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/middleware"
 	"portal-server/store"
 )
 
@@ -63,12 +64,8 @@ func TestGetDevicesEndpoint_LinkedDevices(t *testing.T) {
 }
 
 func testGetDevices(user *model.User) *httptest.ResponseRecorder {
-	// Create the router
-	userRouter := Router{
-		Store:      getDevicesStore,
-		HTTPClient: http.DefaultClient,
-	}
 	r := gin.New()
+	r.Use(middleware.SetStore(getDevicesStore))
 
 	// Set the userID
 	r.Use(func(c *gin.Context) {
@@ -76,7 +73,7 @@ func testGetDevices(user *model.User) *httptest.ResponseRecorder {
 		c.Next()
 	})
 
-	r.GET("/", userRouter.GetDevicesEndpoint)
+	r.GET("/", GetDevicesEndpoint)
 	w := httptest.NewRecorder()
 
 	// Send the input

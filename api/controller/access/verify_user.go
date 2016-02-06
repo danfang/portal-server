@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 	"portal-server/store"
 )
 
@@ -17,15 +18,16 @@ type VerificationToken struct {
 
 // VerifyUserEndpoint handles a GET request that consumes a user's verification token
 // for users who registered with an email and password.
-func (r Router) VerifyUserEndpoint(c *gin.Context) {
-	r.Store.Transaction(func(tx store.Store) error {
-		user, err := checkVerificationToken(tx, c.Param("token"))
+func VerifyUserEndpoint(c *gin.Context) {
+	s := context.StoreFromContext(c)
+	s.Transaction(func(store store.Store) error {
+		user, err := checkVerificationToken(store, c.Param("token"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, controller.RenderError(err))
 			return nil
 		}
 		user.Verified = true
-		if err := tx.Users().SaveUser(user); err != nil {
+		if err := store.Users().SaveUser(user); err != nil {
 			controller.InternalServiceError(c, err)
 			return err
 		}

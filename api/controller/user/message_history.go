@@ -6,6 +6,7 @@ import (
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 )
 
 const messageHistoryLimit = 1000
@@ -24,9 +25,10 @@ type messageBody struct {
 
 // GetMessageHistoryEndpoint retrieves user messages up to a
 // given limit.
-func (r Router) GetMessageHistoryEndpoint(c *gin.Context) {
+func GetMessageHistoryEndpoint(c *gin.Context) {
 	user := c.MustGet("user").(*model.User)
-	messages, err := r.Store.Messages().GetMessagesByUser(user, messageHistoryLimit)
+	store := context.StoreFromContext(c)
+	messages, err := store.Messages().GetMessagesByUser(user, messageHistoryLimit)
 	if err != nil {
 		controller.InternalServiceError(c, err)
 		return

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
+	"portal-server/api/controller/context"
 	"portal-server/store"
 )
 
@@ -19,18 +20,17 @@ type googleLogin struct {
 }
 
 // GoogleLoginEndpoint handles a POST request to login or register with a Google account.
-func (r Router) GoogleLoginEndpoint(c *gin.Context) {
+func GoogleLoginEndpoint(c *gin.Context) {
 	var body googleLogin
 	if !controller.ValidJSON(c, &body) {
 		return
 	}
 
-	client := &util.WebClient{
-		BaseURL:    googleOAuthEndpoint,
-		HTTPClient: r.HTTPClient,
-	}
+	// Create a WebClient for Google OAuth
+	wc := context.WebClientFromContext(c, googleOAuthEndpoint)
 
-	googleUser, err := util.GetGoogleUser(client, body.IDToken)
+	// Fetch the user from Google
+	googleUser, err := util.GetGoogleUser(wc, body.IDToken)
 
 	// Check for errors with the Google user
 	switch {
@@ -52,14 +52,15 @@ func (r Router) GoogleLoginEndpoint(c *gin.Context) {
 
 	var user *model.User
 	var userToken string
-	r.Store.Transaction(func(tx store.Store) error {
-		user, err = createLinkedGoogleAccount(tx, googleUser)
+	s := context.StoreFromContext(c)
+	s.Transaction(func(store store.Store) error {
+		user, err = createLinkedGoogleAccount(store, googleUser)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err
 		}
 
-		userToken, err = createUserToken(tx, user)
+		userToken, err = createUserToken(store, user)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err

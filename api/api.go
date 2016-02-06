@@ -19,27 +19,29 @@ func API(store store.Store, httpClient *http.Client) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 
+	// Set context variables
+	r.Use(middleware.SetStore(store))
+	r.Use(middleware.SetWebClient(httpClient))
+
 	// Add swagger.json file
 	r.StaticFile("/swagger.json", "./api/swagger.json")
 
 	v1 := r.Group("/v1")
 	{
-		accessGroup := v1.Group("/")
+		base := v1.Group("/")
 		{
-			accessRouter := access.Router{Store: store, HTTPClient: httpClient}
-			accessGroup.POST("/register", accessRouter.RegisterEndpoint)
-			accessGroup.POST("/login", accessRouter.LoginEndpoint)
-			accessGroup.POST("/login/google", accessRouter.GoogleLoginEndpoint)
-			accessGroup.GET("/verify/:token", accessRouter.VerifyUserEndpoint)
+			base.POST("/register", access.RegisterEndpoint)
+			base.POST("/login", access.LoginEndpoint)
+			base.POST("/login/google", access.GoogleLoginEndpoint)
+			base.GET("/verify/:token", access.VerifyUserEndpoint)
 		}
 
-		userGroup := v1.Group("/user")
-		userGroup.Use(middleware.AuthenticationMiddleware(store))
+		secure := v1.Group("/user")
+		secure.Use(middleware.AuthenticationMiddleware())
 		{
-			userRouter := user.Router{Store: store, HTTPClient: httpClient}
-			userGroup.POST("/devices", userRouter.AddDeviceEndpoint)
-			userGroup.GET("/devices", userRouter.GetDevicesEndpoint)
-			userGroup.GET("/messages/history", userRouter.GetMessageHistoryEndpoint)
+			secure.POST("/devices", user.AddDeviceEndpoint)
+			secure.GET("/devices", user.GetDevicesEndpoint)
+			secure.GET("/messages/history", user.GetMessageHistoryEndpoint)
 		}
 	}
 	return r

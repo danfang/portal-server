@@ -27,8 +27,8 @@ var (
 
 // GetGoogleUser takes an id token and retrieves a user profile
 // from Google and returns a GoogleUser.
-func GetGoogleUser(gc *WebClient, idToken string) (*GoogleUser, error) {
-	res, err := gc.HTTPClient.Get(gc.BaseURL + "?id_token=" + idToken)
+func GetGoogleUser(wc *WebClient, idToken string) (*GoogleUser, error) {
+	res, err := wc.HTTPClient.Get(wc.BaseURL + "?id_token=" + idToken)
 	if err != nil {
 		return nil, err
 	}

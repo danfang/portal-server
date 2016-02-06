@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/testutil"
 	"portal-server/store"
 )
 
@@ -19,7 +20,16 @@ var auth *gin.Engine
 var authStore store.Store
 
 func init() {
-	gin.SetMode(gin.TestMode)
+	authStore = store.GetTestStore()
+	auth = testutil.TestRouter(
+		SetStore(authStore),
+		AuthenticationMiddleware(),
+	)
+	auth.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, expectedResponse)
+	})
+	createUser("1", "user_token_1", false)
+	createUser("2", "user_token_2", true)
 }
 
 func createUser(uuid, token string, verified bool) {
@@ -30,20 +40,6 @@ func createUser(uuid, token string, verified bool) {
 	}
 	authStore.Users().CreateUser(&user)
 	authStore.UserTokens().CreateToken(&model.UserToken{User: user, Token: token})
-}
-
-func init() {
-	authStore = store.GetTestStore()
-
-	createUser("1", "user_token_1", false)
-	createUser("2", "user_token_2", true)
-
-	auth = gin.New()
-	gin.SetMode(gin.TestMode)
-	auth.Use(AuthenticationMiddleware(authStore))
-	auth.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, expectedResponse)
-	})
 }
 
 func TestAuthentication_MissingHeaders(t *testing.T) {

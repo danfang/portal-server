@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
+	"portal-server/api/controller/context"
 	"portal-server/store"
 )
 
@@ -28,7 +29,7 @@ type passwordRegistration struct {
 
 // RegisterEndpoint handles a POST request to register a new user via
 // email and password.
-func (r Router) RegisterEndpoint(c *gin.Context) {
+func RegisterEndpoint(c *gin.Context) {
 	var body passwordRegistration
 	if !controller.ValidJSON(c, &body) {
 		return
@@ -36,29 +37,31 @@ func (r Router) RegisterEndpoint(c *gin.Context) {
 
 	var user *model.User
 	var verificationToken string
-	r.Store.Transaction(func(tx store.Store) error {
+	s := context.StoreFromContext(c)
+	s.Transaction(func(store store.Store) error {
 		var err error
 
 		// Check unique email
-		if tx.Users().UserCount(&model.User{Email: body.Email}) >= 1 {
+		if store.Users().UserCount(&model.User{Email: body.Email}) >= 1 {
 			err = errs.ErrDuplicateEmail
 			c.JSON(http.StatusBadRequest, controller.RenderError(err))
 			return err
 		}
 
-		user, err = createDefaultUser(tx, &body)
+		user, err = createDefaultUser(store, &body)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err
 		}
 
-		verificationToken, err = createVerificationToken(tx, user)
+		verificationToken, err = createVerificationToken(store, user)
 		if err != nil {
 			controller.InternalServiceError(c, err)
 			return err
 		}
 		return nil
 	})
+	// Send confirmation email to user
 	sendTokenToUser(user.Email, verificationToken)
 	c.JSON(http.StatusOK, controller.RenderSuccess())
 }

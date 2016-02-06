@@ -12,6 +12,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/store"
 )
 
@@ -80,11 +82,8 @@ func TestLoginEndpoint_Valid(t *testing.T) {
 
 func testLogin(input interface{}) *httptest.ResponseRecorder {
 	// Create the router
-	accessRouter := Router{loginStore, http.DefaultClient}
-	r := gin.New()
-
-	// Test the response
-	r.POST("/", accessRouter.LoginEndpoint)
+	r := testutil.TestRouter(middleware.SetStore(loginStore))
+	r.POST("/", LoginEndpoint)
 	w := httptest.NewRecorder()
 
 	// Send the input

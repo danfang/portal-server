@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 )
 
 type passwordLogin struct {
@@ -17,13 +18,14 @@ type passwordLogin struct {
 }
 
 // LoginEndpoint handles a POST request for a user to login via email and password.
-func (r Router) LoginEndpoint(c *gin.Context) {
+func LoginEndpoint(c *gin.Context) {
 	var body passwordLogin
 	if !controller.ValidJSON(c, &body) {
 		return
 	}
 
-	user, found := r.Store.Users().FindUser(&model.User{Email: body.Email})
+	store := context.StoreFromContext(c)
+	user, found := store.Users().FindUser(&model.User{Email: body.Email})
 	if !found || user.Password == "" {
 		c.JSON(http.StatusBadRequest, controller.RenderError(errs.ErrInvalidLogin))
 		return
@@ -45,7 +47,7 @@ func (r Router) LoginEndpoint(c *gin.Context) {
 		return
 	}
 
-	userToken, err := createUserToken(r.Store, user)
+	userToken, err := createUserToken(store, user)
 	if err != nil {
 		controller.InternalServiceError(c, err)
 		return

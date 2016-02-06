@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/store"
 )
 
@@ -153,11 +155,10 @@ func TestCheckVerificationToken_ValidToken(t *testing.T) {
 
 func testVerifyUser(token string) *httptest.ResponseRecorder {
 	// Create the router
-	accessRouter := Router{verifyUserStore, http.DefaultClient}
-	r := gin.New()
+	r := testutil.TestRouter(middleware.SetStore(verifyUserStore))
 
 	// Test the response
-	r.GET("/:token", accessRouter.VerifyUserEndpoint)
+	r.GET("/:token", VerifyUserEndpoint)
 	w := httptest.NewRecorder()
 
 	// Send the input

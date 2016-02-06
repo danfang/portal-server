@@ -1,11 +1,10 @@
 package user
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller"
-	"portal-server/model"
-
-	"github.com/gin-gonic/gin"
+	"portal-server/api/controller/context"
 )
 
 type deviceListResponse struct {
@@ -20,9 +19,10 @@ type linkedDevice struct {
 }
 
 // GetDevicesEndpoint retrieves connected user devices.
-func (r Router) GetDevicesEndpoint(c *gin.Context) {
-	user := c.MustGet("user").(*model.User)
-	devices, err := r.Store.Devices().GetAllLinkedDevices(user)
+func GetDevicesEndpoint(c *gin.Context) {
+	user := context.UserFromContext(c)
+	store := context.StoreFromContext(c)
+	devices, err := store.Devices().GetAllLinkedDevices(user)
 	if err != nil {
 		controller.InternalServiceError(c, err)
 		return

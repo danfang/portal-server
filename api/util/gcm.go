@@ -27,7 +27,7 @@ type gcmResponse struct {
 
 // CreateNotificationGroup contacts Google GCM to create a new
 // Cloud Messaging group, based on the given key and registration ID.
-func CreateNotificationGroup(gcmClient *WebClient, keyName, registrationID string) (string, error) {
+func CreateNotificationGroup(wc *WebClient, keyName, registrationID string) (string, error) {
 	data := notificationGroup{
 		Operation: "create",
 		KeyName:   keyName,
@@ -37,7 +37,7 @@ func CreateNotificationGroup(gcmClient *WebClient, keyName, registrationID strin
 	if err != nil {
 		return "", err
 	}
-	body, err := request(gcmClient, payload)
+	body, err := request(wc, payload)
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +53,7 @@ func CreateNotificationGroup(gcmClient *WebClient, keyName, registrationID strin
 
 // AddNotificationGroup contacts Google GCM to add a user device to an
 // existing registration group.
-func AddNotificationGroup(gcmClient *WebClient, keyName, key, registrationID string) error {
+func AddNotificationGroup(wc *WebClient, keyName, key, registrationID string) error {
 	data := notificationGroup{
 		Operation: "add",
 		KeyName:   keyName,
@@ -64,7 +64,7 @@ func AddNotificationGroup(gcmClient *WebClient, keyName, key, registrationID str
 	if err != nil {
 		return err
 	}
-	body, err := request(gcmClient, payload)
+	body, err := request(wc, payload)
 	if err != nil {
 		return err
 	}
@@ -78,12 +78,12 @@ func AddNotificationGroup(gcmClient *WebClient, keyName, key, registrationID str
 	return nil
 }
 
-func request(gcmClient *WebClient, payload []byte) ([]byte, error) {
-	req, err := http.NewRequest("POST", gcmClient.BaseURL, bytes.NewBuffer(payload))
+func request(wc *WebClient, payload []byte) ([]byte, error) {
+	req, err := http.NewRequest("POST", wc.BaseURL, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "key="+apiKey)
 	req.Header.Set("project_id", senderID)
-	res, err := gcmClient.HTTPClient.Do(req)
+	res, err := wc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

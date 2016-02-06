@@ -14,6 +14,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/store"
 )
 
@@ -264,21 +266,17 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 	assert.Equal(t, 1, count)
 }
 
-func testGoogleLogin(input interface{}, googleResponseCode int, googleResponseBody interface{}) *httptest.ResponseRecorder {
+func testGoogleLogin(input interface{}, code int, response interface{}) *httptest.ResponseRecorder {
 	// Setup mock Google server/client
-	output, _ := json.Marshal(googleResponseBody)
-	server, client := util.TestHTTP(func(*http.Request) {}, googleResponseCode, string(output))
-	defer server.Close()
-
-	// Modify the OAuth endpoint
-	googleOAuthEndpoint = client.BaseURL
-
-	// Create the router based on the db and Mock client
-	accessRouter := Router{googleLoginStore, client.HTTPClient}
-	r := gin.New()
-
+	output, _ := json.Marshal(response)
+	server, client := util.TestHTTP(func(*http.Request) {}, code, string(output))
+	googleOAuthEndpoint = server.URL
+	r := testutil.TestRouter(
+		middleware.SetWebClient(client.HTTPClient),
+		middleware.SetStore(googleLoginStore),
+	)
 	// Test the response
-	r.POST("/", accessRouter.GoogleLoginEndpoint)
+	r.POST("/", GoogleLoginEndpoint)
 	w := httptest.NewRecorder()
 
 	// Send the input

@@ -11,6 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/controller/context"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/store"
 )
 
@@ -82,20 +85,15 @@ func TestGetMessagesEndpoint_AllMessagesLimit(t *testing.T) {
 }
 
 func testGetMessages(user *model.User) *httptest.ResponseRecorder {
-	// Create the router
-	userRouter := Router{
-		Store:      getMessagesStore,
-		HTTPClient: http.DefaultClient,
-	}
-	r := gin.New()
+	r := testutil.TestRouter(middleware.SetStore(getMessagesStore))
 
-	// Set the userID
+	// Set the user context
 	r.Use(func(c *gin.Context) {
-		c.Set("user", user)
+		context.UserToContext(c, user)
 		c.Next()
 	})
 
-	r.GET("/", userRouter.GetMessageHistoryEndpoint)
+	r.GET("/", GetMessageHistoryEndpoint)
 	w := httptest.NewRecorder()
 
 	// Send the input

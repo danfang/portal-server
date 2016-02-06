@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"portal-server/model"
-	"portal-server/model/types"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/google/go-gcm"
@@ -124,7 +123,7 @@ func (s GCMService) recordMessage(cm gcm.CcsMessage, m MessagePayload) error {
 	var device model.Device
 	if s.Db.Where(model.Device{
 		RegistrationID: registrationID,
-		State:          types.DeviceStateLinked.String(),
+		State:          model.DeviceStateLinked,
 	}).First(&device).RecordNotFound() {
 		return ErrUnregisteredDevice
 	}

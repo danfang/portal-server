@@ -30,6 +30,10 @@ func init() {
 }
 
 func GetStore(user, password string) Store {
+	return New(GetDB(user, password))
+}
+
+func GetDB(user, password string) *gorm.DB {
 	params := map[string]string{
 		"dbname":   dbName,
 		"host":     host,
@@ -46,5 +50,5 @@ func GetStore(user, password string) Store {
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
-	return New(&db)
+	return &db
 }

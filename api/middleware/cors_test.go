@@ -7,14 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/testutil"
 )
 
 var corsRouter *gin.Engine
 
 func init() {
-	gin.SetMode(gin.TestMode)
-	corsRouter = gin.New()
-	corsRouter.Use(CORSMiddleware())
+	corsRouter = testutil.TestRouter(CORSMiddleware())
 	corsRouter.GET("/", func(c *gin.Context) {
 		c.String(200, "done")
 	})

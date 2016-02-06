@@ -19,6 +19,7 @@ build:
       - go get -u github.com/satori/go.uuid
       - go get -u github.com/stretchr/testify/assert
       - go get -u golang.org/x/crypto/pbkdf2
+      - go get -u github.com/franela/goblin
       - golint ./api/...
       - go test -cover ./api/...
   gcm:

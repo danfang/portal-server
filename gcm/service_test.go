@@ -5,7 +5,6 @@ import (
 	"errors"
 	"portal-server/gcm/testutil"
 	"portal-server/model"
-	"portal-server/model/types"
 	"testing"
 
 	"github.com/google/go-gcm"
@@ -151,8 +150,8 @@ func TestOnMessageReceived_ValidNewMessage(t *testing.T) {
 	testDb.Create(&model.Device{
 		User:           user,
 		RegistrationID: registrationID,
-		Type:           types.DeviceTypePhone.String(),
-		State:          types.DeviceStateLinked.String(),
+		Type:           model.DeviceTypePhone,
+		State:          model.DeviceStateLinked,
 	})
 	ccs := testutil.TestCCS{
 		XMPPFunc: func(m *gcm.XmppMessage) (string, int, error) {

@@ -8,7 +8,6 @@ import (
 	"portal-server/api/errs"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -18,10 +17,6 @@ import (
 )
 
 var loginStore = store.GetTestStore()
-
-func init() {
-	gin.SetMode(gin.TestMode)
-}
 
 func TestLoginEndpoing_InvalidEmail(t *testing.T) {
 	input := map[string]string{

@@ -19,10 +19,6 @@ import (
 
 var getMessagesStore = store.GetTestStore()
 
-func init() {
-	gin.SetMode(gin.TestMode)
-}
-
 func TestGetMessagesEndpoint_NoMessages(t *testing.T) {
 	w := testGetMessages(&model.User{})
 	assert.Equal(t, 200, w.Code)

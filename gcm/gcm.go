@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/google/go-gcm"
 	"log"
-	"portal-server/model"
+	"portal-server/store"
 )
 
 const (
@@ -13,7 +13,6 @@ const (
 
 const (
 	dbUser     = "portal_gcm"
-	dbName     = "portal"
 	dbPassword = "password"
 )
 
@@ -22,7 +21,7 @@ func init() {
 }
 
 func main() {
-	db := model.GetStore(dbUser, dbName, dbPassword)
+	db := store.GetDB(dbUser, dbPassword)
 	ccs := &GoogleCCS{senderID, apiKey}
 	service := GCMService{db, ccs}
 	log.Fatal(service.CCS.Listen(service.OnMessageReceived, nil))

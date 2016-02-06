@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 	"portal-server/model"
+	"portal-server/store"
 )
 
 const (
 	dbUser     = "portal_db"
-	dbName     = "portal"
 	dbPassword = "password"
 )
 
@@ -28,8 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Connecting to db: ", dbName)
-	db := model.GetStore(dbUser, dbName, dbPassword)
+	db := store.GetDB(dbUser, dbPassword)
 	db.LogMode(true)
 
 	switch args[0] {

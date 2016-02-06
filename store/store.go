@@ -15,6 +15,7 @@ type Store interface {
 	NotificationKeys() NotificationKeyStore
 	UserTokens() UserTokenStore
 	VerificationTokens() VerificationTokenStore
+	teardown()
 }
 
 type store struct {

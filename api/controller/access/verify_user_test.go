@@ -8,8 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/franela/goblin"
 	"github.com/stretchr/testify/assert"
 	"portal-server/api/middleware"
 	"portal-server/api/testutil"
@@ -20,7 +19,6 @@ var verifyUserStore = store.GetTestStore()
 var verifyUser *model.User
 
 func init() {
-	gin.SetMode(gin.TestMode)
 	verifyUser = &model.User{Email: "test@portal.com"}
 	verifyUserStore.Users().CreateUser(verifyUser)
 }
@@ -28,6 +26,20 @@ func init() {
 func TestVerifyUserEndpoint_NoToken(t *testing.T) {
 	w := testVerifyUser("")
 	assert.Equal(t, 404, w.Code)
+}
+
+func TestVerifyUser(t *testing.T) {
+	var s store.Store
+	g := goblin.Goblin(t)
+	g.Describe("GET /verify/user", func() {
+		g.BeforeEach(func() {
+			s = store.GetTestStore()
+		})
+
+		g.AfterEach(func() {
+			store.TeardownStoreForTest(s)
+		})
+	})
 }
 
 func TestVerifyUserEndpoint_BadToken(t *testing.T) {

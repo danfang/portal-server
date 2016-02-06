@@ -44,7 +44,7 @@ func GetDB(user, password string) *gorm.DB {
 	}
 	var conn = ""
 	for k, v := range params {
-		conn += fmt.Sprint("%s=%s ", k, v)
+		conn += fmt.Sprintf("%s=%s ", k, v)
 	}
 	db, err := gorm.Open("postgres", conn)
 	if err != nil {

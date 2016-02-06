@@ -28,7 +28,7 @@ func (db userStore) SaveUser(user *User) error {
 
 func (db userStore) FindUser(where *User) (*User, bool) {
 	var user User
-	if db.Where(where).Find(&user).RecordNotFound() {
+	if db.Where(where).First(&user).RecordNotFound() {
 		return nil, false
 	}
 	return &user, true

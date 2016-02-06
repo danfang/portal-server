@@ -6,23 +6,19 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/errs"
-	"portal-server/model"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
-var loginDB gorm.DB
+var loginStore = store.GetTestStore()
 
 func init() {
 	gin.SetMode(gin.TestMode)
-	loginDB, _ = gorm.Open("sqlite3", ":memory:")
-	loginDB.LogMode(false)
-	loginDB.CreateTable(model.User{}, model.LinkedAccount{}, model.UserToken{})
 }
 
 func TestLoginEndpoing_InvalidEmail(t *testing.T) {
@@ -55,7 +51,7 @@ func TestLoginEndpoint_NoSuchUser(t *testing.T) {
 }
 
 func TestLoginEndpoint_BadPassowrd(t *testing.T) {
-	createDefaultUser(&loginDB, &passwordRegistration{
+	createDefaultUser(loginStore, &passwordRegistration{
 		Email:    "email@domain.com",
 		Password: "my_password",
 	})
@@ -69,7 +65,7 @@ func TestLoginEndpoint_BadPassowrd(t *testing.T) {
 }
 
 func TestLoginEndpoint_Valid(t *testing.T) {
-	createDefaultUser(&loginDB, &passwordRegistration{
+	createDefaultUser(loginStore, &passwordRegistration{
 		Email:    "email2@domain.com",
 		Password: "my_password",
 	})
@@ -84,7 +80,7 @@ func TestLoginEndpoint_Valid(t *testing.T) {
 
 func testLogin(input interface{}) *httptest.ResponseRecorder {
 	// Create the router
-	accessRouter := Router{&loginDB, http.DefaultClient}
+	accessRouter := Router{loginStore, http.DefaultClient}
 	r := gin.New()
 
 	// Test the response

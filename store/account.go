@@ -38,6 +38,6 @@ func (db linkedAccountStore) GetRelatedUser(account *LinkedAccount) (*User, erro
 
 func (db linkedAccountStore) GetCount(where *LinkedAccount) int {
 	var count int
-	db.Where(where).Count(&count)
+	db.Model(&LinkedAccount{}).Where(where).Count(&count)
 	return count
 }

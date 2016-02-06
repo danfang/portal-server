@@ -22,7 +22,7 @@ func (r Router) VerifyUserEndpoint(c *gin.Context) {
 		user, err := checkVerificationToken(tx, c.Param("token"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, controller.RenderError(err))
-			return err
+			return nil
 		}
 		user.Verified = true
 		if err := tx.Users().SaveUser(user); err != nil {

@@ -11,7 +11,6 @@ import (
 
 const (
 	dbUser     = "portal_api"
-	dbName     = "portal"
 	dbPassword = "password"
 )
 
@@ -47,7 +46,7 @@ func API(store store.Store, httpClient *http.Client) *gin.Engine {
 }
 
 func main() {
-	store := store.GetStore(dbUser, dbName, dbPassword)
+	store := store.GetStore(dbUser, dbPassword)
 	httpClient := http.DefaultClient
 	API(store, httpClient).Run(":8080")
 }

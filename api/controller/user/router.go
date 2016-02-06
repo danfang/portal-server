@@ -3,7 +3,6 @@ package user
 import (
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	"portal-server/store"
 )
 

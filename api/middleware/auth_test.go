@@ -18,6 +18,10 @@ const expectedResponse = "done"
 var auth *gin.Engine
 var authStore store.Store
 
+func init() {
+	gin.SetMode(gin.TestMode)
+}
+
 func createUser(uuid, token string, verified bool) {
 	user := model.User{
 		UUID:     uuid,

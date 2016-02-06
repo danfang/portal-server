@@ -9,6 +9,7 @@ type UserTokenStore interface {
 	FindToken(where *UserToken) (*UserToken, bool)
 	DeleteToken(token *UserToken) error
 	CreateToken(token *UserToken) error
+	GetRelatedUser(token *UserToken) (*User, error)
 }
 
 type userTokenStore struct {
@@ -29,4 +30,12 @@ func (db userTokenStore) DeleteToken(token *UserToken) error {
 
 func (db userTokenStore) CreateToken(token *UserToken) error {
 	return db.Create(token).Error
+}
+
+func (db userTokenStore) GetRelatedUser(token *UserToken) (*User, error) {
+	var user User
+	if err := db.Model(token).Related(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

@@ -19,6 +19,10 @@ import (
 
 var googleLoginStore = store.GetTestStore()
 
+func init() {
+	gin.SetMode(gin.TestMode)
+}
+
 func TestGoogleLoginEndpoint_BadInput(t *testing.T) {
 	input := map[string]string{
 		"id_token": "",
@@ -113,7 +117,7 @@ func TestGoogleLoginEndpoint_ExistingUser(t *testing.T) {
 	assertValidLoginResponse(t, w)
 
 	// Check linked account is in DB
-	linkedAccount, _ := googleLoginStore.LinkedAccounts.FindAccount(&model.LinkedAccount{
+	linkedAccount, _ := googleLoginStore.LinkedAccounts().FindAccount(&model.LinkedAccount{
 		AccountID: "existing_user_sub",
 		Type:      model.LinkedAccountTypeGoogle,
 	})
@@ -173,7 +177,7 @@ func TestCreateLinkedGoogleAccount(t *testing.T) {
 		Email:         "google@google.com",
 		Sub:           "10000",
 	}
-	user, err := createLinkedGoogleAccount(&googleLoginStore, &googleUser)
+	user, err := createLinkedGoogleAccount(googleLoginStore, &googleUser)
 	assert.NoError(t, err)
 
 	fromDB, _ := googleLoginStore.Users().FindUser(&model.User{Email: "google@google.com"})
@@ -206,7 +210,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_NoLinkedAccount(t *testing.T) {
 		Sub:           "12345",
 	}
 
-	user, err := createLinkedGoogleAccount(&googleLoginStore, &googleUser)
+	user, err := createLinkedGoogleAccount(googleLoginStore, &googleUser)
 	assert.NoError(t, err)
 
 	fromDB, _ := googleLoginStore.Users().FindUser(&model.User{Email: "stannis@portal.com"})
@@ -239,7 +243,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 		Type:      model.LinkedAccountTypeGoogle,
 	}
 
-	googleLoginStore.Users().CreateUser(&linkedAccount)
+	googleLoginStore.LinkedAccounts().CreateAccount(&linkedAccount)
 
 	googleUser := util.GoogleUser{
 		Sub:   googleAccountID,
@@ -247,7 +251,7 @@ func TestCreateLinkedGoogleAccount_ExistingUser_ExistingLinkedAccount(t *testing
 	}
 
 	// Make sure no data is modified
-	user, err := createLinkedGoogleAccount(&googleLoginStore, &googleUser)
+	user, err := createLinkedGoogleAccount(googleLoginStore, &googleUser)
 	assert.NoError(t, err)
 	assert.Equal(t, original.ID, user.ID)
 	assert.Equal(t, original.Email, user.Email)
@@ -270,7 +274,7 @@ func testGoogleLogin(input interface{}, googleResponseCode int, googleResponseBo
 	googleOAuthEndpoint = client.BaseURL
 
 	// Create the router based on the db and Mock client
-	accessRouter := Router{&googleLoginStore, client.HTTPClient}
+	accessRouter := Router{googleLoginStore, client.HTTPClient}
 	r := gin.New()
 
 	// Test the response

@@ -38,7 +38,7 @@ func AuthenticationMiddleware(store store.Store) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", user)
+		c.Set("user", user)
 		c.Next()
 	}
 }

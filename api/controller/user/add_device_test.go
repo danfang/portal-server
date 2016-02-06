@@ -8,18 +8,12 @@ import (
 	"portal-server/model"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
-var addDeviceDB gorm.DB
-
-func init() {
-	addDeviceDB, _ = gorm.Open("sqlite3", ":memory:")
-	addDeviceDB.LogMode(false)
-	addDeviceDB.CreateTable(&model.User{}, &model.EncryptionKey{}, &model.Device{}, &model.NotificationKey{})
-}
+var addDeviceStore = store.GetTestStore()
 
 func TestCreateDevice(t *testing.T) {
 	user := &model.User{
@@ -27,27 +21,26 @@ func TestCreateDevice(t *testing.T) {
 		Verified: true,
 	}
 
-	addDeviceDB.Create(user)
+	addDeviceStore.Users().CreateUser(user)
 
 	body := &addDevice{
 		RegistrationID: "a_token",
 		Type:           model.DeviceTypePhone,
 	}
 
-	device, err := createDevice(&addDeviceDB, user, body)
+	device, err := createDevice(addDeviceStore, user, body)
 	assert.NoError(t, err)
 	assert.Equal(t, "a_token", device.RegistrationID)
 	assert.Equal(t, model.DeviceTypePhone, device.Type)
 	assert.Equal(t, model.DeviceStateLinked, device.State)
 
-	var fromDB model.User
-	addDeviceDB.Model(device).Related(&fromDB)
+	fromDB, _ := addDeviceStore.Devices().GetRelatedUser(device)
 	assert.Equal(t, user.ID, fromDB.ID)
 	assert.Equal(t, user.Email, fromDB.Email)
 	assert.Equal(t, user.Verified, fromDB.Verified)
 
 	// Cannot create duplicate devices for the same user
-	_, err = createDevice(&addDeviceDB, user, body)
+	_, err = createDevice(addDeviceStore, user, body)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "UNIQUE")
 
@@ -55,14 +48,14 @@ func TestCreateDevice(t *testing.T) {
 	otherUser := &model.User{
 		Email: "abc@def.com",
 	}
-	_, err = createDevice(&addDeviceDB, otherUser, body)
+	_, err = createDevice(addDeviceStore, otherUser, body)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "UNIQUE")
 }
 
 func TestCreateNotificationKey(t *testing.T) {
-	user := model.User{Email: "test2@portal.com"}
-	addDeviceDB.Create(&user)
+	user := &model.User{Email: "test2@portal.com"}
+	err := addDeviceStore.Users().CreateUser(user)
 	notificationKey := "notificationKey"
 	mockResponse, _ := json.Marshal(map[string]string{
 		"notification_key": notificationKey,
@@ -73,20 +66,19 @@ func TestCreateNotificationKey(t *testing.T) {
 	}
 	server, client := util.TestHTTP(requestTest, 200, string(mockResponse))
 	defer server.Close()
-	key, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key, err := createNotificationKey(addDeviceStore, client, user, "registrationId")
 	assert.NoError(t, err)
 	assert.Regexp(t, "^[a-fA-F0-9]+$", key.GroupName)
 	assert.Equal(t, notificationKey, key.Key)
 
-	var fromDB model.User
-	addDeviceDB.Model(key).Related(&fromDB)
+	fromDB, _ := addDeviceStore.NotificationKeys().GetRelatedUser(key)
 	assert.Equal(t, user.ID, fromDB.ID)
 	assert.Equal(t, user.Email, fromDB.Email)
 }
 
 func TestCreateNotificationKey_Duplicate(t *testing.T) {
-	user := model.User{Email: "test3@portal.com"}
-	addDeviceDB.Create(&user)
+	user := &model.User{Email: "test3@portal.com"}
+	addDeviceStore.Users().CreateUser(user)
 
 	notificationKey := "notificationKey"
 	mockResponse, _ := json.Marshal(map[string]string{
@@ -99,7 +91,7 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 		assert.Contains(t, string(body), "create")
 	}
 	server, client := util.TestHTTP(requestTest, 200, string(mockResponse))
-	key1, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key1, err := createNotificationKey(addDeviceStore, client, user, "registrationId")
 	assert.NoError(t, err)
 	assert.Equal(t, notificationKey, key1.Key)
 	server.Close()
@@ -110,7 +102,7 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 		assert.Contains(t, string(body), "add")
 	}
 	server, client = util.TestHTTP(requestTest, 200, string(mockResponse))
-	key2, err := createNotificationKey(&addDeviceDB, client, &user, "registrationId")
+	key2, err := createNotificationKey(addDeviceStore, client, user, "registrationId")
 
 	// Make sure the keys are the same
 	assert.NoError(t, err)
@@ -118,34 +110,31 @@ func TestCreateNotificationKey_Duplicate(t *testing.T) {
 	assert.Equal(t, key1.GroupName, key2.GroupName)
 
 	// Make sure only one key exists in the DB
-	var count int
-	addDeviceDB.Model(&model.NotificationKey{}).Where("user_id = ?", user.ID).Count(&count)
+	count := addDeviceStore.NotificationKeys().GetCount(&model.NotificationKey{UserID: user.ID})
 	assert.Equal(t, 1, count)
 
 	server.Close()
 }
 
 func TestGetEncryptionKey(t *testing.T) {
-	user := model.User{Email: "test4@portal.com"}
-	addDeviceDB.Create(&user)
+	user := &model.User{Email: "test4@portal.com"}
+	addDeviceStore.Users().CreateUser(user)
 
 	// Create the key
-	key1, err := getEncryptionKey(&addDeviceDB, &user)
+	key1, err := getEncryptionKey(addDeviceStore, user)
 	assert.NoError(t, err)
 	assert.Regexp(t, "^[a-fA-F0-9]{64}$", key1.Key)
 
-	var fromDB model.User
-	addDeviceDB.Model(key1).Related(&fromDB)
+	fromDB, _ := addDeviceStore.EncryptionKeys().GetRelatedUser(key1)
 	assert.Equal(t, user.ID, fromDB.ID)
 	assert.Equal(t, user.Email, fromDB.Email)
 
 	// Attempt to create a duplicate key
-	key2, err := getEncryptionKey(&addDeviceDB, &user)
+	key2, err := getEncryptionKey(addDeviceStore, user)
 	assert.NoError(t, err)
 	assert.Equal(t, key1.Key, key2.Key)
 
 	// Make sure only one key exists in the DB
-	var count int
-	addDeviceDB.Model(&model.EncryptionKey{}).Where("user_id = ?", user.ID).Count(&count)
+	count := addDeviceStore.EncryptionKeys().GetCount(&model.EncryptionKey{UserID: user.ID})
 	assert.Equal(t, 1, count)
 }

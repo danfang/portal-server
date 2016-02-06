@@ -8,21 +8,19 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
-var getDevicesDB gorm.DB
+var getDevicesStore = store.GetTestStore()
 
 func init() {
 	gin.SetMode(gin.TestMode)
-	getDevicesDB, _ = gorm.Open("sqlite3", ":memory:")
-	getDevicesDB.CreateTable(&model.User{}, &model.Device{})
 }
 
 func TestGetDevicesEndpoint_NoDevices(t *testing.T) {
-	w := testGetDevices(404)
+	w := testGetDevices(&model.User{})
 	assert.Equal(t, 200, w.Code)
 	expected, _ := json.Marshal(gin.H{
 		"devices": []linkedDevice{},
@@ -34,29 +32,29 @@ func TestGetDevicesEndpoint_LinkedDevices(t *testing.T) {
 	user := model.User{
 		Email: "test@portal.com",
 	}
-	getDevicesDB.Create(&user)
-	getDevicesDB.Create(&model.Device{
+	getDevicesStore.Users().CreateUser(&user)
+	getDevicesStore.Devices().CreateDevice(&model.Device{
 		User:           user,
 		Name:           "Nexus 6P",
 		Type:           "phone",
 		RegistrationID: "1",
 		State:          model.DeviceStateLinked,
 	})
-	getDevicesDB.Create(&model.Device{
+	getDevicesStore.Devices().CreateDevice(&model.Device{
 		User:           user,
 		Name:           "Chrome 4.2",
 		Type:           "chrome",
 		RegistrationID: "2",
 		State:          model.DeviceStateLinked,
 	})
-	getDevicesDB.Create(&model.Device{
+	getDevicesStore.Devices().CreateDevice(&model.Device{
 		User:           user,
 		Name:           "Unlinked Desktop",
 		Type:           "desktop",
 		RegistrationID: "3",
 		State:          model.DeviceStateUnlinked,
 	})
-	w := testGetDevices(user.ID)
+	w := testGetDevices(&user)
 	assert.Equal(t, 200, w.Code)
 
 	var res deviceListResponse
@@ -64,14 +62,17 @@ func TestGetDevicesEndpoint_LinkedDevices(t *testing.T) {
 	assert.Equal(t, 2, len(res.Devices))
 }
 
-func testGetDevices(userID uint) *httptest.ResponseRecorder {
+func testGetDevices(user *model.User) *httptest.ResponseRecorder {
 	// Create the router
-	userRouter := Router{&getDevicesDB, http.DefaultClient}
+	userRouter := Router{
+		Store:      getDevicesStore,
+		HTTPClient: http.DefaultClient,
+	}
 	r := gin.New()
 
 	// Set the userID
 	r.Use(func(c *gin.Context) {
-		c.Set("userID", userID)
+		c.Set("user", user)
 		c.Next()
 	})
 

@@ -9,21 +9,19 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/store"
 )
 
-var getMessagesDB gorm.DB
+var getMessagesStore = store.GetTestStore()
 
 func init() {
 	gin.SetMode(gin.TestMode)
-	getMessagesDB, _ = gorm.Open("sqlite3", ":memory:")
-	getMessagesDB.CreateTable(&model.User{}, &model.Message{})
 }
 
 func TestGetMessagesEndpoint_NoMessages(t *testing.T) {
-	w := testGetMessages(404)
+	w := testGetMessages(&model.User{})
 	assert.Equal(t, 200, w.Code)
 	assert.JSONEq(t, `{"messages":[]}`, w.Body.String())
 }
@@ -32,7 +30,7 @@ func TestGetMessagesEndpoint_AllMessages(t *testing.T) {
 	user := model.User{
 		Email: "test@portal.com",
 	}
-	getMessagesDB.Create(&user)
+	getMessagesStore.Users().CreateUser(&user)
 	message := &model.Message{
 		User:      user,
 		To:        "justin",
@@ -40,8 +38,8 @@ func TestGetMessagesEndpoint_AllMessages(t *testing.T) {
 		Body:      "hello",
 		Status:    model.MessageStatusDelivered,
 	}
-	getMessagesDB.Create(&message)
-	w := testGetMessages(user.ID)
+	getMessagesStore.Messages().CreateMessage(message)
+	w := testGetMessages(&user)
 	assert.Equal(t, 200, w.Code)
 	var res messageHistoryResponse
 	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
@@ -57,10 +55,10 @@ func TestGetMessagesEndpoint_AllMessagesLimit(t *testing.T) {
 	user := model.User{
 		Email: "test2@portal.com",
 	}
-	getMessagesDB.Create(&user)
+	getMessagesStore.Users().CreateUser(&user)
 	messagesCreated := 3 * messageHistoryLimit
 	for i := 1; i <= messagesCreated; i++ {
-		getMessagesDB.Create(&model.Message{
+		getMessagesStore.Messages().CreateMessage(&model.Message{
 			User:      user,
 			To:        "myself",
 			MessageID: fmt.Sprintf("message%d", i),
@@ -68,7 +66,7 @@ func TestGetMessagesEndpoint_AllMessagesLimit(t *testing.T) {
 			Status:    model.MessageStatusDelivered,
 		})
 	}
-	w := testGetMessages(user.ID)
+	w := testGetMessages(&user)
 	assert.Equal(t, 200, w.Code)
 	var res messageHistoryResponse
 	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
@@ -83,14 +81,17 @@ func TestGetMessagesEndpoint_AllMessagesLimit(t *testing.T) {
 	}
 }
 
-func testGetMessages(userID uint) *httptest.ResponseRecorder {
+func testGetMessages(user *model.User) *httptest.ResponseRecorder {
 	// Create the router
-	userRouter := Router{&getMessagesDB, http.DefaultClient}
+	userRouter := Router{
+		Store:      getMessagesStore,
+		HTTPClient: http.DefaultClient,
+	}
 	r := gin.New()
 
 	// Set the userID
 	r.Use(func(c *gin.Context) {
-		c.Set("userID", userID)
+		c.Set("user", user)
 		c.Next()
 	})
 

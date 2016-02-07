@@ -8,32 +8,13 @@ clone:
   path: portal-server
 
 build:
-  api:
-    image: golang:1.5
-    commands:
-      - go get -u github.com/asaskevich/govalidator
-      - go get -u github.com/gin-gonic/gin
-      - go get -u github.com/golang/lint/golint
-      - go get -u github.com/jinzhu/gorm
-      - go get -u github.com/mattn/go-sqlite3
-      - go get -u github.com/satori/go.uuid
-      - go get -u github.com/stretchr/testify/assert
-      - go get -u golang.org/x/crypto/pbkdf2
-      - go get -u github.com/franela/goblin
-      - golint ./api/...
-      - go test -cover ./api/...
-  gcm:
-    image: golang:1.5
-    commands:
-      - go get -u github.com/asaskevich/govalidator
-      - go get -u github.com/google/go-gcm
-      - go get -u github.com/golang/lint/golint
-      - go get -u github.com/jinzhu/gorm
-      - go get -u github.com/mattn/go-sqlite3
-      - go get -u github.com/satori/go.uuid
-      - go get -u github.com/stretchr/testify/assert
-      - golint ./gcm/...
-      - go test -cover ./gcm/...
+  image: golang:1.5
+  environment:
+    - GO15VENDOREXPERIMENT=1
+  commands:
+    - go get github.com/tools/godep
+    - godep restore
+    - go test -cover -v ./api/... ./gcm/... ./store/... ./model/...
 
 notify:
   slack:

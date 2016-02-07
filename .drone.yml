@@ -1,10 +1,8 @@
 cache:
   mount:
-    - /drone/src
-    - /drone/pkg
+    - vendor/
 
 clone:
-  depth: 50
   path: portal-server
 
 build:
@@ -12,9 +10,7 @@ build:
   environment:
     - GO15VENDOREXPERIMENT=1
   commands:
-    - go get github.com/tools/godep
-    - godep restore
-    - go test -cover -v ./api/... ./gcm/... ./store/... ./model/...
+    - go test -cover ./api/... ./gcm/...
 
 notify:
   slack:
@@ -25,14 +21,14 @@ notify:
 publish:
   gcr:
     when:
-      branch: master
+      event: tag
     repo: gcr.io/messaging-1174/portal/api
     file: Dockerfile.api
     token: >
       $$GCR_KEY
   gcr:
     when:
-      branch: master
+      event: tag
     repo: gcr.io/messaging-1174/portal/gcm
     file: Dockerfile.gcm
     token: >

@@ -1,5 +1,7 @@
 .git/
-secrets.yml
+.idea/
+*.iml
+.secrets.yml
 .drone.yml
 .drone.sec
 README.md

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-DB_CONTAINER=gcr.io/messaging-1174/portal/db
-API_CONTAINER=gcr.io/messaging-1174/portal/api
-GCM_CONTAINER=gcr.io/messaging-1174/portal/gcm
+GCR_SERVER=gcr.io/messaging-1174/portal-server
+GCR_DB=gcr.io/messaging-1174/portal/db
 
 echo "Stopping existing Docker containers..."
 
@@ -12,20 +11,19 @@ docker rm -f portal_gcm
 
 echo "Fetching latest images..."
 
-gcloud docker pull $DB_CONTAINER:latest
-gcloud docker pull $API_CONTAINER:latest
-gcloud docker pull $GCM_CONTAINER:latest
+gcloud docker pull $GCR_DB:latest
+gcloud docker pull $GCR_SERVER:latest
 
 echo "Starting the portal database..."
 
-docker run --restart=always -v /var/lib/postgresql/data:/var/lib/postgresql/data -d --name portal_db $DB_CONTAINER
+docker run --restart=always -v /var/lib/postgresql/data:/var/lib/postgresql/data -d --name portal_db $GCR_DB
 
 setup_db() {
     echo "Setting up portal database..."
     docker exec -u postgres portal_db ./setup.sh
 
     echo "Performing database operation: $1..."
-    docker run --rm --name portal_api --link portal_db:postgres $API_CONTAINER ./dbtool $1
+    docker run --rm --link portal_db:postgres $GCR_SERVER ./dbtool $1
 
     echo "Setting up database permissions..."
     docker exec -u postgres portal_db ./permissions.sh
@@ -41,7 +39,9 @@ else
 fi
 
 echo "Starting Portal GCM server..."
-docker run -d --restart=always --name portal_gcm --link portal_db:postgres $GCM_CONTAINER
+docker run -d --restart=always --name portal_gcm --link portal_db:postgres $GCR_SERVER
 
-echo "Running Portal API on port 8080 (Ctrl-p Ctrl-q to daemonize)"
-docker run --restart=always -p 8080:8080 -ti --name portal_api --link portal_db:postgres $API_CONTAINER
+echo "Starting Portal API on port 8080..."
+docker run -d --restart=always --name portal_api --link portal_db:postgres -p 8080:8080 $GCR_SERVER
+
+echo "Successfully deployed containers"

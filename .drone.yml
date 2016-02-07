@@ -22,14 +22,6 @@ publish:
   gcr:
     when:
       event: tag
-    repo: gcr.io/messaging-1174/portal/api
-    file: Dockerfile.api
-    token: >
-      $$GCR_KEY
-  gcr:
-    when:
-      event: tag
-    repo: gcr.io/messaging-1174/portal/gcm
-    file: Dockerfile.gcm
+    repo: gcr.io/messaging-1174/portal-server
     token: >
       $$GCR_KEY

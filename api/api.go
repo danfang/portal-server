@@ -42,6 +42,7 @@ func API(store store.Store, httpClient *http.Client) *gin.Engine {
 			secure.POST("/devices", user.AddDeviceEndpoint)
 			secure.GET("/devices", user.GetDevicesEndpoint)
 			secure.GET("/messages/history", user.GetMessageHistoryEndpoint)
+			secure.POST("/signout", user.SignoutEndpoint)
 		}
 	}
 	return r

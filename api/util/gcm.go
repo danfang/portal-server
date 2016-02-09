@@ -28,25 +28,14 @@ type gcmResponse struct {
 // CreateNotificationGroup contacts Google GCM to create a new
 // Cloud Messaging group, based on the given key and registration ID.
 func CreateNotificationGroup(wc *WebClient, keyName, registrationID string) (string, error) {
-	data := notificationGroup{
+	data := &notificationGroup{
 		Operation: "create",
 		KeyName:   keyName,
 		Tokens:    []string{registrationID},
 	}
-	payload, err := json.Marshal(&data)
+	res, err := handleRequest(wc, data)
 	if err != nil {
 		return "", err
-	}
-	body, err := request(wc, payload)
-	if err != nil {
-		return "", err
-	}
-	var res gcmResponse
-	if err := json.Unmarshal(body, &res); err != nil {
-		return "", err
-	}
-	if res.Error != "" {
-		return "", errs.GCMError(res.Error)
 	}
 	return res.Key, nil
 }
@@ -54,28 +43,46 @@ func CreateNotificationGroup(wc *WebClient, keyName, registrationID string) (str
 // AddNotificationGroup contacts Google GCM to add a user device to an
 // existing registration group.
 func AddNotificationGroup(wc *WebClient, keyName, key, registrationID string) error {
-	data := notificationGroup{
+	data := &notificationGroup{
 		Operation: "add",
 		KeyName:   keyName,
 		Key:       key,
 		Tokens:    []string{registrationID},
 	}
-	payload, err := json.Marshal(&data)
+	_, err := handleRequest(wc, data)
+	return err
+}
+
+// RemoveNotificationGroup contacts Google GCM to remove a user device from an
+// existing registration group.
+func RemoveNotificationGroup(wc *WebClient, keyName, key, registrationID string) error {
+	data := &notificationGroup{
+		Operation: "remove",
+		KeyName:   keyName,
+		Key:       key,
+		Tokens:    []string{registrationID},
+	}
+	_, err := handleRequest(wc, data)
+	return err
+}
+
+func handleRequest(wc *WebClient, data *notificationGroup) (*gcmResponse, error) {
+	payload, err := json.Marshal(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	body, err := request(wc, payload)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var res gcmResponse
 	if err := json.Unmarshal(body, &res); err != nil {
-		return err
+		return nil, err
 	}
 	if res.Error != "" {
-		return errs.GCMError(res.Error)
+		return nil, errs.GCMError(res.Error)
 	}
-	return nil
+	return &res, nil
 }
 
 func request(wc *WebClient, payload []byte) ([]byte, error) {

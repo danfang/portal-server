@@ -16,7 +16,9 @@ gcloud docker pull $GCR_SERVER:latest
 
 echo "Starting the portal database..."
 
-docker run --restart=always -v /var/lib/postgresql/data:/var/lib/postgresql/data -d --name portal_db $GCR_DB
+docker run -d --restart=always --name portal_db \
+           -v /var/lib/postgresql/data:/var/lib/postgresql/data \
+           -p 5432:5432 $GCR_DB
 
 setup_db() {
     echo "Setting up portal database..."
@@ -39,9 +41,13 @@ else
 fi
 
 echo "Starting Portal GCM server..."
-docker run -d --restart=always --name portal_gcm --link portal_db:postgres $GCR_SERVER
+docker run -d --restart=always --name portal_gcm \
+           --link portal_db:postgres \
+           $GCR_SERVER ./portalgcm
 
 echo "Starting Portal API on port 8080..."
-docker run -d --restart=always --name portal_api --link portal_db:postgres -p 8080:8080 $GCR_SERVER
+docker run -d --restart=always --name portal_api \
+           --link portal_db:postgres -p 8080:8080 \
+           $GCR_SERVER ./portalapi
 
 echo "Successfully deployed containers"

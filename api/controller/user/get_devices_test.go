@@ -10,66 +10,87 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"portal-server/api/controller/context"
 	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/store"
+	"portal-server/vendor/github.com/franela/goblin"
+	"portal-server/vendor/github.com/satori/go.uuid"
 )
 
-var getDevicesStore = store.GetTestStore()
+func TestGetDevices(t *testing.T) {
+	var s store.Store
+	g := goblin.Goblin(t)
+	g.Describe("GET /user/devices", func() {
+		g.BeforeEach(func() {
+			s = store.GetTestStore()
+		})
 
-func init() {
-	gin.SetMode(gin.TestMode)
+		g.AfterEach(func() {
+			store.TeardownStoreForTest(s)
+		})
+
+		g.It("Should return an empty array for a user with no linked devices", func() {
+			w := testGetDevices(s, &model.User{})
+			assert.Equal(t, 200, w.Code)
+			expected, _ := json.Marshal(gin.H{
+				"devices": []linkedDevice{},
+			})
+			assert.JSONEq(t, string(expected), w.Body.String())
+		})
+
+		g.It("Should retrieve all linked devices for a user", func() {
+			user := model.User{Email: "test@portal.com"}
+			s.Users().CreateUser(&user)
+			key := model.NotificationKey{
+				User:      user,
+				Key:       "key",
+				GroupName: "name",
+			}
+			s.NotificationKeys().CreateKey(&key)
+			s.Devices().CreateDevice(&model.Device{
+				User:            user,
+				NotificationKey: key,
+				UUID:            uuid.NewV4().String(),
+				Name:            "Nexus 6P",
+				Type:            "phone",
+				RegistrationID:  "1",
+				State:           model.DeviceStateLinked,
+			})
+			s.Devices().CreateDevice(&model.Device{
+				User:            user,
+				NotificationKey: key,
+				UUID:            uuid.NewV4().String(),
+				Name:            "Chrome 4.2",
+				Type:            "chrome",
+				RegistrationID:  "2",
+				State:           model.DeviceStateLinked,
+			})
+			s.Devices().CreateDevice(&model.Device{
+				User:            user,
+				NotificationKey: key,
+				UUID:            uuid.NewV4().String(),
+				Name:            "Unlinked Desktop",
+				Type:            "desktop",
+				RegistrationID:  "3",
+				State:           model.DeviceStateUnlinked,
+			})
+			w := testGetDevices(s, &user)
+			assert.Equal(t, 200, w.Code)
+
+			var res deviceListResponse
+			assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
+			assert.Equal(t, 2, len(res.Devices))
+		})
+	})
 }
 
-func TestGetDevicesEndpoint_NoDevices(t *testing.T) {
-	w := testGetDevices(&model.User{})
-	assert.Equal(t, 200, w.Code)
-	expected, _ := json.Marshal(gin.H{
-		"devices": []linkedDevice{},
-	})
-	assert.JSONEq(t, string(expected), w.Body.String())
-}
-
-func TestGetDevicesEndpoint_LinkedDevices(t *testing.T) {
-	user := model.User{
-		Email: "test@portal.com",
-	}
-	getDevicesStore.Users().CreateUser(&user)
-	getDevicesStore.Devices().CreateDevice(&model.Device{
-		User:           user,
-		Name:           "Nexus 6P",
-		Type:           "phone",
-		RegistrationID: "1",
-		State:          model.DeviceStateLinked,
-	})
-	getDevicesStore.Devices().CreateDevice(&model.Device{
-		User:           user,
-		Name:           "Chrome 4.2",
-		Type:           "chrome",
-		RegistrationID: "2",
-		State:          model.DeviceStateLinked,
-	})
-	getDevicesStore.Devices().CreateDevice(&model.Device{
-		User:           user,
-		Name:           "Unlinked Desktop",
-		Type:           "desktop",
-		RegistrationID: "3",
-		State:          model.DeviceStateUnlinked,
-	})
-	w := testGetDevices(&user)
-	assert.Equal(t, 200, w.Code)
-
-	var res deviceListResponse
-	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
-	assert.Equal(t, 2, len(res.Devices))
-}
-
-func testGetDevices(user *model.User) *httptest.ResponseRecorder {
-	r := gin.New()
-	r.Use(middleware.SetStore(getDevicesStore))
+func testGetDevices(s store.Store, user *model.User) *httptest.ResponseRecorder {
+	r := testutil.TestRouter(middleware.SetStore(s))
 
 	// Set the userID
 	r.Use(func(c *gin.Context) {
-		c.Set("user", user)
+		context.UserToContext(c, user)
 		c.Next()
 	})
 

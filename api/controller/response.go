@@ -7,25 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// An ErrorResponse wraps a bad request with an error code string.
-//
-// swagger:response error
-type ErrorResponse struct {
-	// in: body
-	Body Error
-}
-
 // An Error contains an error JSON object containing an error.
 type Error struct {
 	Error string `json:"error"`
-}
-
-// A DetailErrorResponse gives both the error and reason for the error.
-//
-// swagger:response detailError
-type DetailErrorResponse struct {
-	// in: body
-	Body DetailError
 }
 
 // A DetailError contains a JSON object with both an error and an error reason.

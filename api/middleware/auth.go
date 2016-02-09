@@ -33,7 +33,7 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 
 		// Check for valid token for the given user
 		store := context.StoreFromContext(c)
-		user, err := authenticate(store, token, userUUID)
+		user, userToken, err := authenticate(store, token, userUUID)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, controller.RenderError(err))
 			c.Abort()
@@ -41,32 +41,34 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 		}
 
 		context.UserToContext(c, user)
+		context.UserTokenToContext(c, userToken)
 		c.Next()
 	}
 }
 
-func authenticate(store store.Store, token, uuid string) (*model.User, error) {
+func authenticate(store store.Store, token, uuid string) (*model.User, *model.UserToken, error) {
 	// User not found
 	user, found := store.Users().FindUser(&model.User{UUID: uuid})
 	if !found {
-		return nil, errs.ErrInvalidUserToken
+		return nil, nil, errs.ErrInvalidUserToken
 	}
 
 	// Token not found
 	userToken, found := store.UserTokens().FindToken(&model.UserToken{Token: token, UserID: user.ID})
 	if !found {
-		return nil, errs.ErrInvalidUserToken
+		return nil, nil, errs.ErrInvalidUserToken
 	}
 
 	// Token expired
 	if !userToken.ExpiresAt.IsZero() && time.Now().After(userToken.ExpiresAt) {
 		store.UserTokens().DeleteToken(userToken)
-		return nil, errs.ErrInvalidUserToken
+		return nil, nil, errs.ErrInvalidUserToken
 	}
 
 	// Account not verified
 	if !user.Verified {
-		return nil, errs.ErrAccountNotVerified
+		return nil, nil, errs.ErrAccountNotVerified
 	}
-	return user, nil
+
+	return user, userToken, nil
 }

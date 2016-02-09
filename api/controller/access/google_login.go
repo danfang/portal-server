@@ -75,13 +75,13 @@ func GoogleLoginEndpoint(c *gin.Context) {
 
 func createLinkedGoogleAccount(store store.Store, googleUser *util.GoogleUser) (*model.User, error) {
 	var user *model.User
-	account, err := store.LinkedAccounts().FindAccount(&model.LinkedAccount{
+	account, found := store.LinkedAccounts().FindAccount(&model.LinkedAccount{
 		AccountID: googleUser.Sub,
 		Type:      model.LinkedAccountTypeGoogle,
 	})
-	if err != nil {
+	if !found {
 		// Create new user account, if none exists.
-		user, err = store.Users().FindOrCreateUser(&model.User{Email: googleUser.Email}, &model.User{
+		user, err := store.Users().FindOrCreateUser(&model.User{Email: googleUser.Email}, &model.User{
 			UUID:      uuid.NewV4().String(),
 			FirstName: googleUser.GivenName,
 			LastName:  googleUser.FamilyName,
@@ -107,7 +107,7 @@ func createLinkedGoogleAccount(store store.Store, googleUser *util.GoogleUser) (
 		}
 		return user, nil
 	}
-	user, err = store.LinkedAccounts().GetRelatedUser(account)
+	user, err := store.LinkedAccounts().GetRelatedUser(account)
 	if err != nil {
 		return nil, err
 	}

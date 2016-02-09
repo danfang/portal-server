@@ -6,7 +6,7 @@ import (
 )
 
 type LinkedAccountStore interface {
-	FindAccount(where *LinkedAccount) (*LinkedAccount, error)
+	FindAccount(where *LinkedAccount) (*LinkedAccount, bool)
 	CreateAccount(proto *LinkedAccount) error
 	GetRelatedUser(account *LinkedAccount) (*User, error)
 	GetCount(where *LinkedAccount) int
@@ -16,12 +16,12 @@ type linkedAccountStore struct {
 	*gorm.DB
 }
 
-func (db linkedAccountStore) FindAccount(where *LinkedAccount) (*LinkedAccount, error) {
+func (db linkedAccountStore) FindAccount(where *LinkedAccount) (*LinkedAccount, bool) {
 	var account LinkedAccount
 	if err := db.Where(where).First(&account).Error; err != nil {
-		return nil, err
+		return nil, false
 	}
-	return &account, nil
+	return &account, true
 }
 
 func (db linkedAccountStore) CreateAccount(proto *LinkedAccount) error {

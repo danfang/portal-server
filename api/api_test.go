@@ -80,5 +80,12 @@ func TestAPI(t *testing.T) {
 			api.ServeHTTP(w, req)
 			assert.Equal(t, http.StatusUnauthorized, w.Code)
 		})
+
+		g.It("Should allow a POST /user/signout", func() {
+			req, _ := http.NewRequest("POST", "/v1/user/signout", bytes.NewBufferString(""))
+			w := httptest.NewRecorder()
+			api.ServeHTTP(w, req)
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		})
 	})
 }

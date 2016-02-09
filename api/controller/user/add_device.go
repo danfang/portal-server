@@ -12,9 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"portal-server/api/controller/context"
 	"portal-server/store"
+	"portal-server/vendor/github.com/satori/go.uuid"
 )
 
-const gcmEndpoint = "https://android.googleapis.com/gcm/notification"
+var gcmEndpoint = "https://android.googleapis.com/gcm/notification"
 
 type addDevice struct {
 	RegistrationID string `json:"registration_id" valid:"required"`
@@ -23,6 +24,7 @@ type addDevice struct {
 }
 
 type addDeviceResponse struct {
+	DeviceID        string `json:"device_id"`
 	EncryptionKey   string `json:"encryption_key"`
 	NotificationKey string `json:"notification_key"`
 }
@@ -36,9 +38,9 @@ func AddDeviceEndpoint(c *gin.Context) {
 	}
 
 	user := context.UserFromContext(c)
+	s := context.StoreFromContext(c)
 	wc := context.WebClientFromContext(c, gcmEndpoint)
 
-	s := context.StoreFromContext(c)
 	s.Transaction(func(store store.Store) error {
 		var err error
 		if store.Devices().DeviceCount(&model.Device{RegistrationID: body.RegistrationID}) >= 1 {
@@ -47,18 +49,18 @@ func AddDeviceEndpoint(c *gin.Context) {
 			return err
 		}
 
-		device, err := createDevice(store, user, &body)
-		if err != nil {
-			controller.InternalServiceError(c, err)
-			return err
-		}
-
-		notificationKey, err := createNotificationKey(store, wc, user, device.RegistrationID)
+		notificationKey, err := createNotificationKey(store, wc, user, body.RegistrationID)
 		if err, isGCMError := err.(errs.GCMError); isGCMError {
 			c.JSON(http.StatusBadRequest, controller.DetailError{
 				Error:  errs.ErrUnableToRegisterDevice.Error(),
 				Reason: err.Error(),
 			})
+			return err
+		}
+
+		device, err := createDevice(store, user, &body, notificationKey)
+		if err != nil {
+			controller.InternalServiceError(c, err)
 			return err
 		}
 
@@ -73,6 +75,7 @@ func AddDeviceEndpoint(c *gin.Context) {
 			return err
 		}
 		c.JSON(http.StatusOK, addDeviceResponse{
+			DeviceID:        device.UUID,
 			EncryptionKey:   encryptionKey.Key,
 			NotificationKey: notificationKey.Key,
 		})
@@ -80,13 +83,15 @@ func AddDeviceEndpoint(c *gin.Context) {
 	})
 }
 
-func createDevice(store store.Store, user *model.User, body *addDevice) (*model.Device, error) {
+func createDevice(store store.Store, user *model.User, body *addDevice, notificationKey *model.NotificationKey) (*model.Device, error) {
 	device := &model.Device{
-		User:           *user,
-		RegistrationID: body.RegistrationID,
-		Name:           body.Name,
-		Type:           body.Type,
-		State:          model.DeviceStateLinked,
+		User:            *user,
+		NotificationKey: *notificationKey,
+		UUID:            uuid.NewV4().String(),
+		RegistrationID:  body.RegistrationID,
+		Name:            body.Name,
+		Type:            body.Type,
+		State:           model.DeviceStateLinked,
 	}
 	if err := store.Devices().CreateDevice(device); err != nil {
 		return nil, err

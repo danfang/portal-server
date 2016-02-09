@@ -33,7 +33,7 @@ func (db deviceStore) DeleteDevice(device *Device) error {
 
 func (db deviceStore) DeviceCount(where *Device) int {
 	var count int
-	db.Where(where).Count(&count)
+	db.Model(&Device{}).Where(where).Count(&count)
 	return count
 }
 

@@ -115,6 +115,7 @@ func TestAddDevice(t *testing.T) {
 			requestTest = func(r *http.Request) {
 				body, _ := ioutil.ReadAll(r.Body)
 				assert.Contains(t, string(body), "add")
+				assert.Contains(t, string(body), notificationKey)
 			}
 			server, client = util.TestHTTP(requestTest, 200, string(mockResponse))
 			key2, err := createNotificationKey(s, client, user, "registrationId")

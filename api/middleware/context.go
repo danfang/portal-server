@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller/context"
 	"portal-server/store"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SetStore injects the datastore into every gin context

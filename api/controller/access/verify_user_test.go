@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/errs"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/model"
+	"portal-server/store"
 	"testing"
 	"time"
 
 	"github.com/franela/goblin"
 	"github.com/stretchr/testify/assert"
-	"portal-server/api/middleware"
-	"portal-server/api/testutil"
-	"portal-server/store"
 )
 
 var verifyUserStore = store.GetTestStore()

@@ -10,9 +10,9 @@ import (
 	"portal-server/model"
 
 	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
 	"portal-server/api/controller/context"
 	"portal-server/store"
-	"portal-server/vendor/github.com/satori/go.uuid"
 )
 
 var gcmEndpoint = "https://android.googleapis.com/gcm/notification"

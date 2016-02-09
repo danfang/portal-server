@@ -5,14 +5,14 @@ import (
 	"encoding/hex"
 	"net/http"
 	"portal-server/api/controller"
+	"portal-server/api/controller/context"
 	"portal-server/api/errs"
 	"portal-server/model"
+	"portal-server/store"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
-	"portal-server/api/controller/context"
-	"portal-server/store"
 )
 
 type passwordRegistration struct {

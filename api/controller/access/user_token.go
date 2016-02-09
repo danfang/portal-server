@@ -4,9 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"portal-server/model"
-	"time"
-
 	"portal-server/store"
+	"time"
 )
 
 func createUserToken(store store.Store, user *model.User) (string, error) {

@@ -1,9 +1,10 @@
 package context
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 const wcKey = "webclient"

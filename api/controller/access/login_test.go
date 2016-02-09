@@ -6,14 +6,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/errs"
-	"testing"
-
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
 	"portal-server/api/middleware"
 	"portal-server/api/testutil"
 	"portal-server/store"
+	"testing"
+
+	"github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 var loginStore = store.GetTestStore()

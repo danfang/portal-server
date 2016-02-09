@@ -7,15 +7,14 @@ import (
 	"portal-server/model"
 	"testing"
 
+	"github.com/franela/goblin"
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"portal-server/api/controller/context"
 	"portal-server/api/middleware"
 	"portal-server/api/testutil"
 	"portal-server/store"
-	"portal-server/vendor/github.com/franela/goblin"
-	"portal-server/vendor/github.com/satori/go.uuid"
 )
 
 func TestGetDevices(t *testing.T) {

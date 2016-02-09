@@ -4,12 +4,12 @@ import (
 	"encoding/hex"
 	"net/http"
 	"portal-server/api/controller"
+	"portal-server/api/controller/context"
 	"portal-server/api/errs"
 	"portal-server/model"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"portal-server/api/controller/context"
 )
 
 type passwordLogin struct {

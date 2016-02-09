@@ -6,16 +6,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/errs"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/api/util"
 	"portal-server/model"
+	"portal-server/store"
 	"testing"
 
 	"github.com/franela/goblin"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"portal-server/api/middleware"
-	"portal-server/api/testutil"
-	"portal-server/store"
 )
 
 func TestGoogleLogin(t *testing.T) {

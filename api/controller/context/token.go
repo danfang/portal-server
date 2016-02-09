@@ -1,8 +1,9 @@
 package context
 
 import (
-	"github.com/gin-gonic/gin"
 	"portal-server/model"
+
+	"github.com/gin-gonic/gin"
 )
 
 const userTokenKey = "userToken"

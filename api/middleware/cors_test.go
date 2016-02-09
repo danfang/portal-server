@@ -3,11 +3,11 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
+	"portal-server/api/testutil"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"portal-server/api/testutil"
 )
 
 var corsRouter *gin.Engine

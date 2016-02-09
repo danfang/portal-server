@@ -2,11 +2,10 @@ package access
 
 import (
 	"portal-server/model"
+	"portal-server/store"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"portal-server/store"
 )
 
 var userTokenStore = store.GetTestStore()

@@ -3,12 +3,11 @@ package access
 import (
 	"encoding/hex"
 	"portal-server/model"
+	"portal-server/store"
 	"strings"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"portal-server/store"
 )
 
 var registerStore = store.GetTestStore()

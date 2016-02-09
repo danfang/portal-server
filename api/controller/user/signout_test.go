@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"bytes"
+	"github.com/franela/goblin"
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"portal-server/api/controller/context"
@@ -17,7 +17,6 @@ import (
 	"portal-server/api/testutil"
 	"portal-server/api/util"
 	"portal-server/store"
-	"portal-server/vendor/github.com/franela/goblin"
 )
 
 func TestSignout(t *testing.T) {

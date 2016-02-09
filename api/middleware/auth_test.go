@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"portal-server/api/testutil"
 	"portal-server/model"
+	"portal-server/store"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"portal-server/api/testutil"
-	"portal-server/store"
 )
 
 const expectedResponse = "done"

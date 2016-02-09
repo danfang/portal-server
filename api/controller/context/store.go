@@ -1,8 +1,9 @@
 package context
 
 import (
-	"github.com/gin-gonic/gin"
 	"portal-server/store"
+
+	"github.com/gin-gonic/gin"
 )
 
 const storeKey = "store"

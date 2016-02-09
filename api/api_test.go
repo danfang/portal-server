@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"portal-server/store"
 	"testing"
 
 	"github.com/franela/goblin"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"portal-server/store"
 )
 
 func TestAPI(t *testing.T) {

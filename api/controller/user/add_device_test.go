@@ -8,11 +8,10 @@ import (
 	"portal-server/model"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/franela/goblin"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"portal-server/store"
-	"portal-server/vendor/github.com/franela/goblin"
-	"portal-server/vendor/github.com/satori/go.uuid"
 )
 
 var s = store.GetTestStore()

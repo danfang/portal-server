@@ -3,14 +3,14 @@ package access
 import (
 	"net/http"
 	"portal-server/api/controller"
+	"portal-server/api/controller/context"
 	"portal-server/api/errs"
 	"portal-server/api/util"
 	"portal-server/model"
+	"portal-server/store"
 
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
-	"portal-server/api/controller/context"
-	"portal-server/store"
 )
 
 var googleOAuthEndpoint = "https://www.googleapis.com/oauth2/v3/tokeninfo"

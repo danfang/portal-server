@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"portal-server/api/controller/context"
+	"portal-server/api/middleware"
+	"portal-server/api/testutil"
 	"portal-server/model"
+	"portal-server/store"
 	"testing"
 
 	"github.com/franela/goblin"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"portal-server/api/controller/context"
-	"portal-server/api/middleware"
-	"portal-server/api/testutil"
-	"portal-server/store"
 )
 
 func TestGetDevices(t *testing.T) {

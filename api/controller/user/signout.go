@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"portal-server/api/controller"
 	"portal-server/api/controller/context"
-	"portal-server/api/util"
 	"portal-server/model"
 )
 
@@ -25,15 +24,8 @@ func SignoutEndpoint(c *gin.Context) {
 	// Get the device and associated notification key
 	device, found := s.Devices().FindDevice(&model.Device{UserID: user.ID, UUID: body.DeviceID})
 	if found {
-		key, err := s.Devices().GetRelatedKey(device)
-		if err == nil {
-			// Unregister the key
-			wc := context.WebClientFromContext(c, gcmEndpoint)
-			util.RemoveNotificationGroup(wc, key.GroupName, key.Key, device.RegistrationID)
-
-			// Delete the device
-			s.Devices().DeleteDevice(device)
-		}
+		device.State = model.DeviceStateUnlinked
+		s.Devices().SaveDevice(device)
 	}
 
 	// Delete the user token

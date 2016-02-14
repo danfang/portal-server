@@ -38,7 +38,7 @@ func (s *store) Transaction(t func(txStore Store) error) {
 	txStore := New(tx)
 	if err := t(txStore); err != nil {
 		tx.Rollback()
-		log.Println("Database rollback caused by %v", err)
+		log.Printf("Database rollback: %v\n", err)
 		return
 	}
 	tx.Commit()

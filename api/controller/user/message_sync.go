@@ -1,32 +1,23 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller"
 	"portal-server/api/controller/context"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
-const messageHistoryLimit = 1000
-
-type messageHistoryResponse struct {
-	Messages []messageBody `json:"messages"`
-}
-
-type messageBody struct {
-	MessageID string `json:"mid"`
-	To        string `json:"to"`
-	Status    string `json:"status"`
-	Body      string `json:"body"`
-	At        int64  `json:"at"`
-}
-
-// GetMessageHistoryEndpoint retrieves user messages up to a
-// given limit.
-func GetMessageHistoryEndpoint(c *gin.Context) {
+func SyncMessagesEndpoint(c *gin.Context) {
 	user := context.UserFromContext(c)
 	store := context.StoreFromContext(c)
-	messages, err := store.Messages().GetMessagesByUser(user, messageHistoryLimit)
+	messageID := c.Param("mid")
+	messages, err := store.Messages().GetMessagesSince(user, messageID)
+	if err == gorm.RecordNotFound {
+		c.JSON(http.StatusBadRequest, controller.RenderError(err))
+		return
+	}
 	if err != nil {
 		controller.InternalServiceError(c, err)
 		return

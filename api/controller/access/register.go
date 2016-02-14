@@ -69,13 +69,12 @@ func createDefaultUser(store store.Store, body *passwordRegistration) (*model.Us
 	}
 	password := hashPassword(body.Password, salt)
 	user := &model.User{
-		UUID:        uuid.NewV4().String(),
-		FirstName:   body.FirstName,
-		LastName:    body.LastName,
-		Email:       body.Email,
-		Password:    password + ":" + hex.EncodeToString(salt),
-		Verified:    false,
-		PhoneNumber: body.PhoneNumber,
+		UUID:      uuid.NewV4().String(),
+		FirstName: body.FirstName,
+		LastName:  body.LastName,
+		Email:     body.Email,
+		Password:  password + ":" + hex.EncodeToString(salt),
+		Verified:  false,
 	}
 	if err := store.Users().CreateUser(user); err != nil {
 		return nil, err

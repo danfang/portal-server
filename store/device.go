@@ -7,6 +7,7 @@ import (
 
 type DeviceStore interface {
 	FindDevice(where *Device) (*Device, bool)
+	SaveDevice(device *Device) error
 	DeleteDevice(device *Device) error
 	DeviceCount(where *Device) int
 	CreateDevice(proto *Device) error
@@ -25,6 +26,10 @@ func (db deviceStore) FindDevice(where *Device) (*Device, bool) {
 		return nil, false
 	}
 	return &device, true
+}
+
+func (db deviceStore) SaveDevice(device *Device) error {
+	return db.Save(device).Error
 }
 
 func (db deviceStore) DeleteDevice(device *Device) error {

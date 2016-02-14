@@ -11,11 +11,9 @@ import (
 	"github.com/franela/goblin"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"portal-server/api/controller/context"
 	"portal-server/api/middleware"
 	"portal-server/api/testutil"
-	"portal-server/api/util"
 	"portal-server/store"
 )
 
@@ -58,18 +56,13 @@ func TestSignout(t *testing.T) {
 				RegistrationID:  "registration_id",
 			}
 			s.Devices().CreateDevice(&device)
-			requestTest := func(r *http.Request) {
-				body, _ := ioutil.ReadAll(r.Body)
-				assert.Contains(t, string(body), "remove")
-				assert.Contains(t, string(body), "registration_id")
-			}
-			w := testSignout(requestTest, s, &user, &userToken, signout{
+			w := testSignout(s, &user, &userToken, signout{
 				DeviceID: device.UUID,
 			})
 			assert.Equal(t, 200, w.Code)
 
-			count := s.Devices().DeviceCount(&model.Device{})
-			assert.Equal(t, 0, count)
+			fromDB, _ := s.Devices().FindDevice(&model.Device{UserID: user.ID})
+			assert.Equal(t, model.DeviceStateUnlinked, fromDB.State)
 
 			_, found := s.UserTokens().FindToken(&model.UserToken{})
 			assert.False(t, found)
@@ -77,17 +70,8 @@ func TestSignout(t *testing.T) {
 	})
 }
 
-func testSignout(requestTest func(*http.Request),
-	s store.Store, user *model.User, userToken *model.UserToken, input interface{}) *httptest.ResponseRecorder {
-
-	server, client := util.TestHTTP(requestTest, 200, "")
-
-	gcmEndpoint = server.URL
-
-	r := testutil.TestRouter(
-		middleware.SetStore(s),
-		middleware.SetWebClient(client.HTTPClient),
-	)
+func testSignout(s store.Store, user *model.User, userToken *model.UserToken, input interface{}) *httptest.ResponseRecorder {
+	r := testutil.TestRouter(middleware.SetStore(s))
 
 	// Set the user and token
 	r.Use(func(c *gin.Context) {

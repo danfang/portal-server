@@ -6,13 +6,23 @@ import (
 )
 
 type MessageStore interface {
+	FindMessage(where *Message) (*Message, bool)
 	GetMessagesByUser(user *User, limit int) ([]Message, error)
 	GetMessagesSince(user *User, messageID string) ([]Message, error)
 	CreateMessage(proto *Message) error
+	SaveMessage(message *Message) error
 }
 
 type messageStore struct {
 	*gorm.DB
+}
+
+func (db messageStore) FindMessage(where *Message) (*Message, bool) {
+	var message Message
+	if db.Where(where).First(&message).RecordNotFound() {
+		return nil, false
+	}
+	return &message, true
 }
 
 func (db messageStore) GetMessagesByUser(user *User, limit int) ([]Message, error) {
@@ -39,4 +49,8 @@ func (db messageStore) GetMessagesSince(user *User, messageID string) ([]Message
 
 func (db messageStore) CreateMessage(proto *Message) error {
 	return db.Create(proto).Error
+}
+
+func (db messageStore) SaveMessage(message *Message) error {
+	return db.Save(message).Error
 }

@@ -21,8 +21,8 @@ func init() {
 }
 
 func main() {
-	db := store.GetDB(dbUser, dbPassword)
+	s := store.GetStore(dbUser, dbPassword)
 	ccs := &GoogleCCS{senderID, apiKey}
-	service := GCMService{db, ccs}
+	service := GCMService{Store: s, CCS: ccs}
 	log.Fatal(service.CCS.Listen(service.OnMessageReceived, nil))
 }

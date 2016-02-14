@@ -8,16 +8,16 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/google/go-gcm"
-	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
+	"portal-server/store"
 )
 
 // A GCMService handles upstream messages from a CloudConnectionService
 // and sends appropriate responses downstream to clients. It also performs
 // message validation and persistence.
 type GCMService struct {
-	Db  *gorm.DB
-	CCS CloudConnectionServer
+	Store store.Store
+	CCS   CloudConnectionServer
 }
 
 // Message keys
@@ -37,6 +37,7 @@ var (
 	ErrInvalidMessagePayload = errors.New("invalid_message_payload")
 	ErrInvalidMessageType    = errors.New("invalid_message_type")
 	ErrUnregisteredDevice    = errors.New("unregistered_device")
+	ErrMessageNotFound       = errors.New("message_not_found")
 )
 
 // MessagePayload is the message structure sent when a Portal client creates
@@ -77,6 +78,15 @@ func (s GCMService) OnMessageReceived(cm gcm.CcsMessage) error {
 		var message StatusPayload
 		if err := getPayload(d[payload], &message); err != nil {
 			s.errorMessage(cm.From, ErrInvalidMessagePayload, err.Error())
+			return nil
+		}
+		err := s.updateMessage(cm, message)
+		if err == ErrUnregisteredDevice {
+			s.errorMessage(cm.From, err, "device not found")
+			return nil
+		}
+		if err == ErrMessageNotFound {
+			s.errorMessage(cm.From, err, "message not found")
 			return nil
 		}
 	default:
@@ -120,11 +130,11 @@ func getPayload(payload interface{}, result interface{}) error {
 
 func (s GCMService) recordMessage(cm gcm.CcsMessage, m MessagePayload) error {
 	registrationID := cm.From
-	var device model.Device
-	if s.Db.Where(model.Device{
+	device, found := s.Store.Devices().FindDevice(&model.Device{
 		RegistrationID: registrationID,
 		State:          model.DeviceStateLinked,
-	}).First(&device).RecordNotFound() {
+	})
+	if !found {
 		return ErrUnregisteredDevice
 	}
 	message := &model.Message{
@@ -134,8 +144,22 @@ func (s GCMService) recordMessage(cm gcm.CcsMessage, m MessagePayload) error {
 		To:        m.To,
 		Body:      m.Body,
 	}
-	if err := s.Db.Create(message).Error; err != nil {
-		return err
+	return s.Store.Messages().CreateMessage(message)
+}
+
+func (s GCMService) updateMessage(cm gcm.CcsMessage, m StatusPayload) error {
+	registrationID := cm.From
+	device, found := s.Store.Devices().FindDevice(&model.Device{
+		RegistrationID: registrationID,
+		State:          model.DeviceStateLinked,
+	})
+	if !found {
+		return ErrUnregisteredDevice
 	}
-	return nil
+	message, found := s.Store.Messages().FindMessage(&model.Message{UserID: device.UserID, MessageID: m.MessageID})
+	if !found {
+		return ErrMessageNotFound
+	}
+	message.Status = m.Status
+	return s.Store.Messages().SaveMessage(message)
 }

@@ -26,7 +26,7 @@ func TestGetDevices(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should return an empty array for a user with no linked devices", func() {

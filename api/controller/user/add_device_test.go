@@ -25,7 +25,7 @@ func TestAddDevice(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should successfully create a device without duplicates", func() {

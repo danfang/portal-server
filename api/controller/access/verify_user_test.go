@@ -37,7 +37,7 @@ func TestVerifyUser(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 	})
 }

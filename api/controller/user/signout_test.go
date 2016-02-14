@@ -26,7 +26,7 @@ func TestSignout(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should unregister and delete the user device and user token", func() {

@@ -28,7 +28,7 @@ func TestGoogleLogin(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should return 400 on invalid JSON input", func() {
@@ -172,7 +172,7 @@ func TestGoogleLogin(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should successfully create a linked account given a Google user", func() {

@@ -25,7 +25,7 @@ func TestMessageSync(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should give an error for a non-existent message id", func() {

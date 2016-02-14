@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
+	"time"
 )
 
 const dbName = "portal"
@@ -40,15 +41,33 @@ func GetDB(user, password string) *gorm.DB {
 		"port":     port,
 		"user":     user,
 		"password": password,
-		"sslmode":  "disable",
 	}
 	var conn = ""
 	for k, v := range params {
 		conn += fmt.Sprintf("%s=%s ", k, v)
 	}
+	conn += "sslmode=disable"
+
+	// Connect to DB
 	db, err := gorm.Open("postgres", conn)
 	if err != nil {
-		log.Fatalf("Error connecting to database: %v", err)
+		log.Fatalf("Error connecting to database: %v\n", err)
+	}
+
+	// Ping DB
+	if err := pingDatabase(&db); err != nil {
+		log.Fatalf("Database ping attempts failed: %v\n", err)
 	}
 	return &db
+}
+
+func pingDatabase(db *gorm.DB) (err error) {
+	for i := 0; i < 10; i++ {
+		err = db.DB().Ping()
+		if err == nil {
+			return
+		}
+		time.Sleep(time.Second)
+	}
+	return
 }

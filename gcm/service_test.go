@@ -24,7 +24,7 @@ func TestService(t *testing.T) {
 		})
 
 		g.AfterEach(func() {
-			store.TeardownStoreForTest(s)
+			store.TeardownTestStore(s)
 		})
 
 		g.It("Should correctly send a valid new message", func() {

@@ -9,22 +9,30 @@ import (
 )
 
 func GetTestStore() Store {
+	return New(GetTestDB())
+}
+
+func TeardownTestStore(s Store) {
+	s.teardown()
+}
+
+func GetTestDB() *gorm.DB {
 	db, _ := gorm.Open("sqlite3", ":memory:")
 	db.LogMode(false)
 	db.CreateTable(&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
 		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &EncryptionKey{})
-	return New(&db)
+	return &db
 }
 
-func TeardownStoreForTest(s Store) {
-	s.teardown()
-}
-
-func (s *store) teardown() {
-	if _, valid := s.db.DB().Driver().(*sqlite3.SQLiteDriver); !valid {
+func TeardownTestDB(db *gorm.DB) {
+	if _, valid := db.DB().Driver().(*sqlite3.SQLiteDriver); !valid {
 		log.Fatalf("Teardown() should only be used in testing")
 		return
 	}
-	s.db.DropTableIfExists(&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
+	db.DropTableIfExists(&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
 		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &EncryptionKey{})
+}
+
+func (s *store) teardown() {
+	TeardownTestDB(s.db)
 }

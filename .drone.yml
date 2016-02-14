@@ -10,7 +10,14 @@ build:
   environment:
     - GO15VENDOREXPERIMENT=1
   commands:
-    - go test -cover ./api/... ./gcm/...
+    - go test -cover ./api/... ./gcm/... ./store/...
+
+compose:
+  database:
+    image: postgres:9.5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
 
 notify:
   slack:

@@ -4,7 +4,6 @@ import (
 	"github.com/franela/goblin"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
 )
 
 func TestGoogleCCS(t *testing.T) {

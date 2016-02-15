@@ -43,6 +43,7 @@ func AddDeviceEndpoint(c *gin.Context) {
 
 	s.Transaction(func(store store.Store) error {
 		var err error
+
 		if store.Devices().DeviceCount(&model.Device{RegistrationID: body.RegistrationID}) >= 1 {
 			err = errs.ErrDuplicateDeviceToken
 			c.JSON(http.StatusBadRequest, controller.RenderError(err))
@@ -74,6 +75,7 @@ func AddDeviceEndpoint(c *gin.Context) {
 			controller.InternalServiceError(c, err)
 			return err
 		}
+
 		c.JSON(http.StatusOK, addDeviceResponse{
 			DeviceID:        device.UUID,
 			EncryptionKey:   encryptionKey.Key,
@@ -140,7 +142,7 @@ func createNotificationKey(store store.Store, wc *util.WebClient, user *model.Us
 
 func getEncryptionKey(store store.Store, user *model.User) (*model.EncryptionKey, error) {
 	encryptionKey, found := store.EncryptionKeys().FindKey(&model.EncryptionKey{
-		User: *user,
+		UserID: user.ID,
 	})
 	// Create new key if not found
 	if !found {

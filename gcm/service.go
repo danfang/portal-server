@@ -43,7 +43,7 @@ var (
 // MessagePayload is the message structure sent when a Portal client creates
 // a new message and has broadcast it out to its device group.
 type MessagePayload struct {
-	MessageID string `json:"mid" valid:"required"`
+	MessageID string `json:"mid" valid:"required,uuidv4"`
 	To        string `json:"to" valid:"required"`
 	Status    string `json:"status" valid:"required,matches(started|sent|delivered|failed)"`
 	Body      string `json:"body" valid:"required"`
@@ -53,7 +53,7 @@ type MessagePayload struct {
 // StatusPayload is the message structure sent when a Portal client updates
 // the status of an existing message.
 type StatusPayload struct {
-	MessageID string `json:"mid" valid:"required"`
+	MessageID string `json:"mid" valid:"required,uuidv4"`
 	Status    string `json:"status" valid:"required,matches(sent|delivered|failed)"`
 	At        int    `json:"at" valid:"required"`
 }

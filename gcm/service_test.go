@@ -89,7 +89,7 @@ func TestService(t *testing.T) {
 
 		g.It("Should record a valid new message from downstream", func() {
 			registrationID := "registration_id"
-			messageID := "message_id"
+			messageID := uuid.NewV4().String()
 			user := model.User{
 				Email: "test@test.com",
 			}
@@ -130,7 +130,7 @@ func TestService(t *testing.T) {
 
 		g.It("Should not record a new message if the sending device is not found and send an error downstream", func() {
 			registrationID := "unregistered_device"
-			messageID := "unregistered_message_id"
+			messageID := uuid.NewV4().String()
 			ccs := testutil.TestCCS{
 				XMPPFunc: func(m *gcm.XmppMessage) (string, int, error) {
 					assert.Equal(t, m.Data["error"], "unregistered_device")
@@ -158,7 +158,7 @@ func TestService(t *testing.T) {
 
 		g.It("Should not record a new message and send an error on a message payload with a bad discriminator", func() {
 			registrationID := "unregistered_device"
-			messageID := "unregistered_message_id"
+			messageID := uuid.NewV4().String()
 			ccs := testutil.TestCCS{
 				XMPPFunc: func(m *gcm.XmppMessage) (string, int, error) {
 					assert.Equal(t, m.Data["error"], "invalid_message_type")
@@ -186,7 +186,7 @@ func TestService(t *testing.T) {
 
 		g.It("Should not record a new message and send an error on an invalid message payload", func() {
 			registrationID := "unregistered_device"
-			messageID := "unregistered_message_id"
+			messageID := uuid.NewV4().String()
 			ccs := testutil.TestCCS{
 				XMPPFunc: func(m *gcm.XmppMessage) (string, int, error) {
 					assert.Equal(t, m.Data["error"], "invalid_message_payload")
@@ -207,7 +207,7 @@ func TestService(t *testing.T) {
 
 		g.It("Should update a message on valid status message", func() {
 			registrationID := "registration_id"
-			messageID := "message_id"
+			messageID := uuid.NewV4().String()
 			user := model.User{
 				Email: "test@test.com",
 			}
@@ -252,8 +252,9 @@ func TestService(t *testing.T) {
 
 	g.Describe("GCM Message payload marshalling", func() {
 		g.It("Should marshall a new message json body into a MessagePayload struct", func() {
+			mid := uuid.NewV4().String()
 			payload, _ := json.Marshal(map[string]interface{}{
-				"mid":    "message_id",
+				"mid":    mid,
 				"to":     "phone_number",
 				"status": "started",
 				"body":   "hello",
@@ -262,7 +263,7 @@ func TestService(t *testing.T) {
 			var m MessagePayload
 			err := getPayload(string(payload), &m)
 			assert.NoError(t, err)
-			assert.Equal(t, "message_id", m.MessageID)
+			assert.Equal(t, mid, m.MessageID)
 			assert.Equal(t, "phone_number", m.To)
 			assert.Equal(t, "started", m.Status)
 			assert.Equal(t, "hello", m.Body)
@@ -286,22 +287,23 @@ func TestService(t *testing.T) {
 		})
 
 		g.It("Should marshall a status json body into a StatusPayload struct", func() {
+			mid := uuid.NewV4().String()
 			payload, _ := json.Marshal(map[string]interface{}{
-				"mid":    "message_id",
+				"mid":    mid,
 				"status": "sent",
 				"at":     1351700038,
 			})
 			var m StatusPayload
 			err := getPayload(string(payload), &m)
 			assert.NoError(t, err)
-			assert.Equal(t, "message_id", m.MessageID)
+			assert.Equal(t, mid, m.MessageID)
 			assert.Equal(t, "sent", m.Status)
 			assert.Equal(t, 1351700038, m.At)
 		})
 
 		g.It("Should return an error when the json body fails field validation", func() {
 			payload := map[string]interface{}{
-				"mid":    "message_id",
+				"mid":    "bad_uuid",
 				"status": "bad_status",
 				"at":     1351700038,
 			}

@@ -10,31 +10,26 @@ import (
 	"time"
 )
 
-const dbName = "portal"
-
 var (
-	host = "localhost"
-	port = "5432"
+	host = os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
+	port = os.Getenv("POSTGRES_PORT_5432_TCP_PORT")
 )
 
 func init() {
-	envHost := os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
-	envPort := os.Getenv("POSTGRES_PORT_5432_TCP_PORT")
-
-	if envHost != "" {
-		host = envHost
+	if host == "" {
+		host = "localhost"
 	}
 
-	if envPort != "" {
-		port = envPort
+	if port == "" {
+		port = "5432"
 	}
 }
 
-func GetStore(user, password string) Store {
-	return New(GetDB(user, password))
+func GetStore(dbName, user, password string) Store {
+	return New(GetDB(dbName, user, password))
 }
 
-func GetDB(user, password string) *gorm.DB {
+func GetDB(dbName, user, password string) *gorm.DB {
 	params := map[string]string{
 		"dbname":   dbName,
 		"host":     host,

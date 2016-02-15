@@ -7,6 +7,6 @@ import (
 )
 
 func TestGetStore(t *testing.T) {
-	s := GetStore("postgres", "password")
+	s := GetStore("postgres", "postgres", "password")
 	assert.NotNil(t, s)
 }

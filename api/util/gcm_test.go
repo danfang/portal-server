@@ -13,8 +13,8 @@ import (
 func expectRequest(t *testing.T, body interface{}) func(*http.Request) {
 	return func(r *http.Request) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		assert.Equal(t, "key="+apiKey, r.Header.Get("Authorization"))
-		assert.Equal(t, senderID, r.Header.Get("project_id"))
+		assert.Equal(t, "key="+GcmApiKey, r.Header.Get("Authorization"))
+		assert.Equal(t, GcmSenderID, r.Header.Get("project_id"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		expected, _ := json.Marshal(body)
 		actual, _ := ioutil.ReadAll(r.Body)

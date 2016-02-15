@@ -1,6 +1,7 @@
 #### joe made this: https://goel.io/joe
 
 .secrets.yml
+env.*
 
 #####=== IntelliJ ===#####
 

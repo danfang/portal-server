@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"portal-server/model"
 	"portal-server/store"
 )
 
-const (
-	dbUser     = "portal_db"
-	dbPassword = "password"
+var (
+	dbName   = os.Getenv("DB_NAME")
+	user     = os.Getenv("DB_DBTOOL_USER")
+	password = os.Getenv("DB_DBTOOL_PASSWORD")
 )
 
 func validAction(action string) bool {
@@ -28,7 +30,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	db := store.GetDB(dbUser, dbPassword)
+	if dbName == "" || user == "" || password == "" {
+		log.Fatalln("Missing DB_NAME, DB_DBTOOL_USER, or DB_DBTOOL_PASSWORD environment variables")
+	}
+
+	db := store.GetDB(dbName, user, password)
 	db.LogMode(true)
 
 	switch args[0] {

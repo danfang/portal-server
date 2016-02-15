@@ -1,18 +1,22 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"portal-server/api/controller/access"
 	"portal-server/api/controller/user"
 	"portal-server/api/middleware"
 	"portal-server/store"
 
 	"github.com/gin-gonic/gin"
+	"portal-server/api/util"
 )
 
-const (
-	dbUser     = "portal_api"
-	dbPassword = "password"
+var (
+	dbName     = os.Getenv("DB_NAME")
+	dbUser     = os.Getenv("DB_API_USER")
+	dbPassword = os.Getenv("DB_API_PASSWORD")
 )
 
 // API returns a Gin router based on a given database.
@@ -56,7 +60,15 @@ func API(store store.Store, httpClient *http.Client) *gin.Engine {
 }
 
 func main() {
-	store := store.GetStore(dbUser, dbPassword)
+	if util.GcmApiKey == "" || util.GcmSenderID == "" {
+		log.Fatalln("Missing GCM_SENDER_ID or GCM_API_KEY environment variables")
+	}
+
+	if dbName == "" || dbUser == "" || dbPassword == "" {
+		log.Fatalln("Missing DB_NAME, DB_API_USER, or DB_API_PASSWORD environment variables")
+	}
+
+	store := store.GetStore(dbName, dbUser, dbPassword)
 	httpClient := http.DefaultClient
 	API(store, httpClient).Run(":8080")
 }

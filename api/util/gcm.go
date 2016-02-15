@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"portal-server/api/errs"
 )
 
-const (
-	apiKey   = "AIzaSyAC4lW-Fb9tp12Un9LUiZNjw8ttVPQChPs"
-	senderID = "1045304436932"
+var (
+	GcmApiKey   = os.Getenv("GCM_API_KEY")
+	GcmSenderID = os.Getenv("GCM_SENDER_ID")
 )
 
 type notificationGroup struct {
@@ -53,19 +54,6 @@ func AddNotificationGroup(wc *WebClient, keyName, key, registrationID string) er
 	return err
 }
 
-// RemoveNotificationGroup contacts Google GCM to remove a user device from an
-// existing registration group.
-func RemoveNotificationGroup(wc *WebClient, keyName, key, registrationID string) error {
-	data := &notificationGroup{
-		Operation: "remove",
-		KeyName:   keyName,
-		Key:       key,
-		Tokens:    []string{registrationID},
-	}
-	_, err := handleRequest(wc, data)
-	return err
-}
-
 func handleRequest(wc *WebClient, data *notificationGroup) (*gcmResponse, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
@@ -88,8 +76,8 @@ func handleRequest(wc *WebClient, data *notificationGroup) (*gcmResponse, error)
 func request(wc *WebClient, payload []byte) ([]byte, error) {
 	req, err := http.NewRequest("POST", wc.BaseURL, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "key="+apiKey)
-	req.Header.Set("project_id", senderID)
+	req.Header.Set("Authorization", "key="+GcmApiKey)
+	req.Header.Set("project_id", GcmSenderID)
 	res, err := wc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err

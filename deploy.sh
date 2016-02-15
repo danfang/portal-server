@@ -25,7 +25,7 @@ setup_db() {
     docker exec -u postgres portal_db ./setup.sh
 
     echo "Performing database operation: $1..."
-    docker run --rm --link portal_db:postgres $GCR_SERVER ./dbtool $1
+    docker run --rm --env-file ./dbtool.env --link portal_db:postgres $GCR_SERVER ./dbtool $1
 
     echo "Setting up database permissions..."
     docker exec -u postgres portal_db ./permissions.sh
@@ -42,11 +42,13 @@ fi
 
 echo "Starting Portal GCM server..."
 docker run -d --restart=always --name portal_gcm \
+           --env-file ./gcm.env \
            --link portal_db:postgres \
            $GCR_SERVER ./portalgcm
 
 echo "Starting Portal API on port 8080..."
 docker run -d --restart=always --name portal_api \
+           --env-file ./api.env \
            --link portal_db:postgres -p 8080:8080 \
            $GCR_SERVER ./portalapi
 

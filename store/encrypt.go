@@ -18,7 +18,7 @@ type encryptionKeyStore struct {
 
 func (db encryptionKeyStore) FindKey(where *EncryptionKey) (*EncryptionKey, bool) {
 	var key EncryptionKey
-	if db.Find(where).First(&key).RecordNotFound() {
+	if db.Where(where).First(&key).RecordNotFound() {
 		return nil, false
 	}
 	return &key, true

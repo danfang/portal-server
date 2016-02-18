@@ -1,11 +1,11 @@
 package store
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/mattn/go-sqlite3"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	. "portal-server/model"
+
+	"github.com/jinzhu/gorm"
+	"github.com/mattn/go-sqlite3"
 )
 
 func GetTestStore() Store {

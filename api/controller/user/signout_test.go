@@ -1,20 +1,20 @@
 package user
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"portal-server/model"
-	"testing"
-
-	"bytes"
-	"github.com/franela/goblin"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"portal-server/api/controller/context"
 	"portal-server/api/middleware"
 	"portal-server/api/testutil"
+	"portal-server/model"
 	"portal-server/store"
+	"testing"
+
+	"github.com/franela/goblin"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSignout(t *testing.T) {

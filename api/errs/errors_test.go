@@ -1,8 +1,9 @@
 package errs
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGCMError(t *testing.T) {

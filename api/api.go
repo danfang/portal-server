@@ -7,10 +7,10 @@ import (
 	"portal-server/api/controller/access"
 	"portal-server/api/controller/user"
 	"portal-server/api/middleware"
+	"portal-server/api/util"
 	"portal-server/store"
 
 	"github.com/gin-gonic/gin"
-	"portal-server/api/util"
 )
 
 var (

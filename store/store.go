@@ -1,8 +1,9 @@
 package store
 
 import (
-	"github.com/jinzhu/gorm"
 	"log"
+
+	"github.com/jinzhu/gorm"
 )
 
 // A Store represents all the data models and their respective interfaces,

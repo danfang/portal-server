@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/controller/context"
@@ -10,7 +11,6 @@ import (
 	"portal-server/store"
 	"testing"
 
-	"encoding/json"
 	"github.com/franela/goblin"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"

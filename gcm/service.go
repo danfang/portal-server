@@ -5,11 +5,11 @@ import (
 	"errors"
 	"log"
 	"portal-server/model"
+	"portal-server/store"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/google/go-gcm"
 	"github.com/satori/go.uuid"
-	"portal-server/store"
 )
 
 // A GCMService handles upstream messages from a CloudConnectionService

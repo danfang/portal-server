@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
+	"time"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"time"
 )
 
 var (

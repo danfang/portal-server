@@ -1,11 +1,12 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller"
 	"portal-server/api/controller/context"
 	"portal-server/model"
+
+	"github.com/gin-gonic/gin"
 )
 
 type signout struct {

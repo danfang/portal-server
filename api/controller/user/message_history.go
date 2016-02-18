@@ -1,10 +1,11 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"portal-server/api/controller"
 	"portal-server/api/controller/context"
+
+	"github.com/gin-gonic/gin"
 )
 
 const messageHistoryLimit = 1000

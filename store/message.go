@@ -12,6 +12,7 @@ type MessageStore interface {
 	GetMessagesSince(user *User, messageID string) ([]Message, error)
 	CreateMessage(proto *Message) error
 	SaveMessage(message *Message) error
+	DeleteMessages(where *Message) int
 }
 
 type messageStore struct {
@@ -61,4 +62,8 @@ func (db messageStore) CreateMessage(proto *Message) error {
 
 func (db messageStore) SaveMessage(message *Message) error {
 	return db.Save(message).Error
+}
+
+func (db messageStore) DeleteMessages(where *Message) int {
+	return int(db.Where(where).Delete(&Message{}).RowsAffected)
 }

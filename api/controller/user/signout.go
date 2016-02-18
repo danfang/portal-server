@@ -14,20 +14,7 @@ type signout struct {
 }
 
 func SignoutEndpoint(c *gin.Context) {
-	var body signout
-	if !controller.ValidJSON(c, &body) {
-		return
-	}
-
-	user := context.UserFromContext(c)
 	s := context.StoreFromContext(c)
-
-	// Get the device and associated notification key
-	device, found := s.Devices().FindDevice(&model.Device{UserID: user.ID, UUID: body.DeviceID})
-	if found {
-		device.State = model.DeviceStateUnlinked
-		s.Devices().SaveDevice(device)
-	}
 
 	// Delete the user token
 	userToken := context.UserTokenFromContext(c)
@@ -36,5 +23,18 @@ func SignoutEndpoint(c *gin.Context) {
 		controller.InternalServiceError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, controller.RenderSuccess())
+
+	// Unlink the device, if provided
+	var body signout
+	c.BindJSON(&body)
+	if body.DeviceID != "" {
+		user := context.UserFromContext(c)
+		device, found := s.Devices().FindDevice(&model.Device{UserID: user.ID, UUID: body.DeviceID})
+		if found {
+			device.State = model.DeviceStateUnlinked
+			s.Devices().SaveDevice(device)
+		}
+	}
+
+	c.JSON(http.StatusOK, controller.RenderSuccess(true))
 }

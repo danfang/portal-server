@@ -73,8 +73,22 @@ func TestAPI(t *testing.T) {
 			assert.Equal(t, http.StatusUnauthorized, w.Code)
 		})
 
-		g.It("Should allow a GET /user/message/history", func() {
+		g.It("Should allow a GET /user/messages/history", func() {
 			req, _ := http.NewRequest("GET", "/v1/user/messages/history", nil)
+			w := httptest.NewRecorder()
+			api.ServeHTTP(w, req)
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		})
+
+		g.It("Should allow a GET /user/messages/sync/:mid", func() {
+			req, _ := http.NewRequest("GET", "/v1/user/messages/sync/5", nil)
+			w := httptest.NewRecorder()
+			api.ServeHTTP(w, req)
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		})
+
+		g.It("Should allow a DELETE /user/messages/:mid", func() {
+			req, _ := http.NewRequest("DELETE", "/v1/user/messages/5", nil)
 			w := httptest.NewRecorder()
 			api.ServeHTTP(w, req)
 			assert.Equal(t, http.StatusUnauthorized, w.Code)

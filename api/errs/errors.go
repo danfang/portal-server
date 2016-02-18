@@ -17,6 +17,13 @@ var (
 	ErrAccountNotVerified = errors.New("account_not_verified")
 )
 
+// Errors from Google Login
+var (
+	ErrInvalidGoogleIDToken     = errors.New("invalid_google_id_token")
+	ErrGoogleAccountNotVerified = errors.New("google_account_not_verified")
+	ErrGoogleOAuthUnavailable   = errors.New("google_oauth_unavailable")
+)
+
 // Access errors
 var (
 	ErrDuplicateEmail           = errors.New("duplicate_email")
@@ -24,6 +31,11 @@ var (
 	ErrInvalidLogin             = errors.New("invalid_login")
 	ErrInvalidVerificationToken = errors.New("invalid_verification_token")
 	ErrExpiredVerificationToken = errors.New("expired_verification_token")
+)
+
+// Message errors
+var (
+	ErrMessageNotFound = errors.New("message_not_found")
 )
 
 // GCMError wraps an error from Google regarding GCM registration
@@ -39,11 +51,4 @@ var (
 	ErrDuplicateDeviceToken     = errors.New("duplicate_device_token")
 	ErrUnableToRegisterDevice   = errors.New("unable_to_register_device")
 	ErrGCMServiceUnavailable    = GCMError("gcm_service_unavailable")
-)
-
-// Errors from Google Login
-var (
-	ErrInvalidGoogleIDToken     = errors.New("invalid_google_id_token")
-	ErrGoogleAccountNotVerified = errors.New("google_account_not_verified")
-	ErrGoogleOAuthUnavailable   = errors.New("google_oauth_unavailable")
 )

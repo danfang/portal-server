@@ -33,7 +33,7 @@ func VerifyUserEndpoint(c *gin.Context) {
 		}
 		return nil
 	})
-	c.JSON(http.StatusOK, controller.RenderSuccess())
+	c.JSON(http.StatusOK, controller.RenderSuccess(true))
 }
 
 func checkVerificationToken(store store.Store, param string) (*model.User, error) {

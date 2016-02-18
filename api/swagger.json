@@ -1,605 +1,700 @@
 {
-    "consumes": [
-        "application/json"
-    ],
-    "produces": [
-        "application/json"
-    ],
-    "schemes": [
-        "https"
-    ],
-    "swagger": "2.0",
-    "info": {
-        "title": "The Portal Messaging API.",
-        "version": "0.0.1"
-    },
-    "host": "dev.portalmessaging.com",
-    "basePath": "/v1",
-    "paths": {
-        "/login": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "summary": "User login via email and password.",
-                "operationId": "login",
-                "parameters": [
-                    {
-                        "name": "password_login",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/passwordLogin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/loginResponse"
-                    },
-                    "400": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            }
-        },
-        "/login/google": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Login or register via a Google account.",
-                "operationId": "googleLogin",
-                "parameters": [
-                    {
-                        "name": "google_login",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/googleLogin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/loginResponse"
-                    },
-                    "400": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            }
-        },
-        "/register": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "summary": "Register a user via email and password.",
-                "operationId": "register",
-                "parameters": [
-                    {
-                        "name": "password_registration",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/passwordRegistration"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/success"
-                    },
-                    "400": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            }
-        },
-        "/user/devices": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Retrieve a user's existing connected devices.",
-                "operationId": "getDevices",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "X-USER-TOKEN",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "X-USER-ID",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/deviceList"
-                    },
-                    "401": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Register a new Google Cloud Messaging device.",
-                "operationId": "addDevice",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "X-USER-TOKEN",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "X-USER-ID",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "name": "add_device",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/addDevice"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/addDevice"
-                    },
-                    "401": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            }
-        },
-        "/user/messages/history": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Retrieve a user's existing connected devices.",
-                "operationId": "messageHistory",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "X-USER-TOKEN",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "X-USER-ID",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/messageHistory"
-                    },
-                    "401": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    },
-                    "default": {
-                        "$ref": "#/responses/detailError"
-                    }
-                }
-            }
-        },
-        "/user/signout": {
-          "post": {
-            "produces": [
-              "application/json"
-            ],
-            "schemes": [
-              "https"
-            ],
-            "tags": [
-              "user"
-            ],
-            "summary": "Sign out of a session.",
-            "operationId": "signout",
-            "parameters": [
-              {
-                "type": "string",
-                "name": "X-USER-TOKEN",
-                "in": "header",
-                "required": true
-              },
-              {
-                "type": "string",
-                "name": "X-USER-ID",
-                "in": "header",
-                "required": true
-              },
-              {
-                "name": "add_device",
-                "in": "body",
-                "required": true,
-                "schema": {
-                  "$ref": "#/definitions/signout"
-                }
-              }
-            ],
-            "responses": {
-              "200": {
-                "$ref": "#/responses/success"
-              },
-              "401": {
-                "$ref": "#/responses/error"
-              },
-              "500": {
-                "$ref": "#/responses/error"
-              }
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "The Portal Messaging API.",
+    "version": "0.0.1"
+  },
+  "host": "dev.portalmessaging.com",
+  "basePath": "/v1",
+  "paths": {
+    "/login": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "User login via email and password.",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "password_login",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/passwordLogin"
             }
           }
-        },
-        "/verify/{token}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "schemes": [
-                    "https"
-                ],
-                "summary": "Consume a user email verification token.",
-                "operationId": "verifyToken",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "token",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/responses/success"
-                    },
-                    "400": {
-                        "$ref": "#/responses/error"
-                    },
-                    "500": {
-                        "$ref": "#/responses/error"
-                    }
-                }
-            }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/loginResponse"
+          },
+          "400": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
         }
+      }
     },
-    "definitions": {
-        "addDevice": {
-            "type": "object",
-            "required": [
-                "registration_id",
-                "name",
-                "type"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "registration_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "pattern": "(phone,chrome,desktop)"
-                }
-            }
-        },
-        "addDeviceResponse": {
-            "type": "object",
-            "properties": {
-                "device_id": {
-                    "type": "string"
-                },
-                "encryption_key": {
-                    "type": "string"
-                },
-                "notification_key": {
-                    "type": "string"
-                }
-            }
-        },
-        "detailError": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "reason": {
-                    "type": "string"
-                }
-            }
-        },
-        "deviceListResponse": {
-            "type": "object",
-            "properties": {
-                "devices": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/linkedDevice"
-                    }
-                }
-            }
-        },
-        "errorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "googleLogin": {
-            "type": "object",
-            "required": [
-                "id_token"
-            ],
-            "properties": {
-                "id_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "linkedDevice": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer",
-                    "format": "int64"
-                }
-            }
-        },
-        "loginResponse": {
-            "type": "object",
-            "properties": {
-                "user_id": {
-                    "type": "string"
-                },
-                "user_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "messageBody": {
-            "type": "object",
-            "properties": {
-                "at": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "body": {
-                    "type": "string"
-                },
-                "mid": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "to": {
-                    "type": "string"
-                }
-            }
-        },
-        "messageHistoryResponse": {
-            "type": "object",
-            "properties": {
-                "messages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/messageBody"
-                    }
-                }
-            }
-        },
-        "passwordLogin": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "uniqueItems": true
-                },
-                "password": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 6
-                }
-            }
-        },
-        "passwordRegistration": {
-            "type": "object",
-            "required": [
-                "email",
-                "password",
-                "first_name",
-                "last_name"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "uniqueItems": true
-                },
-                "first_name": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 1
-                },
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 1
-                },
-                "password": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 6
-                },
-                "phone_number": {
-                    "type": "string",
-                    "pattern": "^\\+[0-9]{10,12}$"
-                }
-            }
-        },
-        "signout": {
-          "type": "object",
-          "required": [
-            "device_id"
-          ],
-          "properties": {
-            "device_id": {
-              "type": "string"
+    "/login/google": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Login or register via a Google account.",
+        "operationId": "googleLogin",
+        "parameters": [
+          {
+            "name": "google_login",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/googleLogin"
             }
           }
-        },
-        "successResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "boolean"
-                }
-            }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/loginResponse"
+          },
+          "400": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
         }
+      }
     },
-    "responses": {
-        "addDevice": {
-            "description": "AddDeviceResponse contains the encryption and\nnotifica†ion keys for a new GCM client.",
+    "/register": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "Register a user via email and password.",
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "password_registration",
+            "in": "body",
+            "required": true,
             "schema": {
-                "$ref": "#/definitions/addDeviceResponse"
+              "$ref": "#/definitions/passwordRegistration"
             }
-        },
-        "detailError": {
-            "description": "A DetailError gives both the error and reason for the error.",
-            "schema": {
-                "$ref": "#/definitions/detailError"
-            }
-        },
-        "deviceList": {
-            "description": "DeviceListResponse contains existing, connected user devices.",
-            "schema": {
-                "$ref": "#/definitions/deviceListResponse"
-            }
-        },
-        "error": {
-            "description": "An ErrorResponse wraps a bad request with an error code string.",
-            "schema": {
-                "$ref": "#/definitions/errorResponse"
-            }
-        },
-        "loginResponse": {
-            "description": "A LoginResponse contains credentials to make authenticated requests.",
-            "schema": {
-                "$ref": "#/definitions/loginResponse"
-            }
-        },
-        "messageHistory": {
-            "description": "MessageHistoryResponse contains user messages.",
-            "schema": {
-                "$ref": "#/definitions/messageHistoryResponse"
-            }
-        },
-        "success": {
-            "description": "A SuccessResponse denotes whether or not an action was successful.",
-            "schema": {
-                "$ref": "#/definitions/successResponse"
-            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/success"
+          },
+          "400": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
         }
+      }
+    },
+    "/user/devices": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Retrieve a user's existing connected devices.",
+        "operationId": "getDevices",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/deviceList"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Register a new Google Cloud Messaging device.",
+        "operationId": "addDevice",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "add_device",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addDevice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/addDevice"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      }
+    },
+    "/user/messages/history": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Retrieve a user's latest messages (up to a limit).",
+        "operationId": "messageHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/messageHistory"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      }
+    },
+    "/user/messages/sync/{mid}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Get all messages after a given message id.",
+        "operationId": "messageSync",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "mid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/messageHistory"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "404": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/user/messages/{mid}": {
+      "delete": {
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Deletes a given message.",
+        "operationId": "messageDelete",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "mid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/success"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "404": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/user/signout": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Sign out of a session.",
+        "operationId": "signout",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "add_device",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/signout"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/success"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/verify/{token}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "Consume a user email verification token.",
+        "operationId": "verifyToken",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "token",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/success"
+          },
+          "400": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
     }
+  },
+  "definitions": {
+    "addDevice": {
+      "type": "object",
+      "required": [
+        "registration_id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "registration_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "pattern": "(phone,chrome,desktop)"
+        }
+      }
+    },
+    "addDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string"
+        },
+        "encryption_key": {
+          "type": "string"
+        },
+        "notification_key": {
+          "type": "string"
+        }
+      }
+    },
+    "detailError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "deviceListResponse": {
+      "type": "object",
+      "properties": {
+        "devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/linkedDevice"
+          }
+        }
+      }
+    },
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "googleLogin": {
+      "type": "object",
+      "required": [
+        "id_token"
+      ],
+      "properties": {
+        "id_token": {
+          "type": "string"
+        }
+      }
+    },
+    "linkedDevice": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "loginResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_token": {
+          "type": "string"
+        }
+      }
+    },
+    "messageBody": {
+      "type": "object",
+      "properties": {
+        "at": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "body": {
+          "type": "string"
+        },
+        "mid": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    },
+    "messageHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/messageBody"
+          }
+        }
+      }
+    },
+    "passwordLogin": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "password": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 6
+        }
+      }
+    },
+    "passwordRegistration": {
+      "type": "object",
+      "required": [
+        "email",
+        "password",
+        "first_name",
+        "last_name"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "first_name": {
+          "type": "string",
+          "maxLength": 20,
+          "minLength": 1
+        },
+        "last_name": {
+          "type": "string",
+          "maxLength": 20,
+          "minLength": 1
+        },
+        "password": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 6
+        },
+        "phone_number": {
+          "type": "string",
+          "pattern": "^\\+[0-9]{10,12}$"
+        }
+      }
+    },
+    "signout": {
+      "type": "object",
+      "required": [
+        "device_id"
+      ],
+      "properties": {
+        "device_id": {
+          "type": "string"
+        }
+      }
+    },
+    "successResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "responses": {
+    "addDevice": {
+      "description": "AddDeviceResponse contains the encryption and\nnotifica†ion keys for a new GCM client.",
+      "schema": {
+        "$ref": "#/definitions/addDeviceResponse"
+      }
+    },
+    "detailError": {
+      "description": "A DetailError gives both the error and reason for the error.",
+      "schema": {
+        "$ref": "#/definitions/detailError"
+      }
+    },
+    "deviceList": {
+      "description": "DeviceListResponse contains existing, connected user devices.",
+      "schema": {
+        "$ref": "#/definitions/deviceListResponse"
+      }
+    },
+    "error": {
+      "description": "An ErrorResponse wraps a bad request with an error code string.",
+      "schema": {
+        "$ref": "#/definitions/errorResponse"
+      }
+    },
+    "loginResponse": {
+      "description": "A LoginResponse contains credentials to make authenticated requests.",
+      "schema": {
+        "$ref": "#/definitions/loginResponse"
+      }
+    },
+    "messageHistory": {
+      "description": "MessageHistoryResponse contains user messages.",
+      "schema": {
+        "$ref": "#/definitions/messageHistoryResponse"
+      }
+    },
+    "success": {
+      "description": "A SuccessResponse denotes whether or not an action was successful.",
+      "schema": {
+        "$ref": "#/definitions/successResponse"
+      }
+    }
+  }
 }

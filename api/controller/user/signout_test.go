@@ -20,6 +20,7 @@ import (
 func TestSignout(t *testing.T) {
 	var s store.Store
 	g := goblin.Goblin(t)
+
 	g.Describe("GET /user/signout", func() {
 		g.BeforeEach(func() {
 			s = store.GetTestStore()
@@ -27,6 +28,24 @@ func TestSignout(t *testing.T) {
 
 		g.AfterEach(func() {
 			store.TeardownTestStore(s)
+		})
+
+		g.It("Should allow signout with an empty device", func() {
+			user := model.User{
+				Email: "test@portal.com",
+				UUID:  "1",
+			}
+			s.Users().CreateUser(&user)
+			userToken := model.UserToken{
+				User:  user,
+				Token: "token",
+			}
+			s.UserTokens().CreateToken(&userToken)
+			w := testSignout(s, &user, &userToken, "")
+			assert.Equal(t, 200, w.Code)
+
+			_, found := s.UserTokens().FindToken(&model.UserToken{})
+			assert.False(t, found)
 		})
 
 		g.It("Should unregister and delete the user device and user token", func() {

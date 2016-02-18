@@ -48,12 +48,11 @@ func API(store store.Store, httpClient *http.Client) *gin.Engine {
 			secure.GET("/devices", user.GetDevicesEndpoint)
 			secure.GET("/messages/history", user.GetMessageHistoryEndpoint)
 			secure.GET("/messages/sync/:mid", user.SyncMessagesEndpoint)
-			secure.DELETE("/messages/:mid")
-			secure.POST("/signout", user.SignoutEndpoint)
+			secure.DELETE("/messages/:mid", user.DeleteMessageEndpoint)
 			secure.POST("/contacts")
 			secure.GET("/contacts")
 			secure.DELETE("/contacts/:cid")
-			secure.DELETE("/contacts")
+			secure.POST("/signout", user.SignoutEndpoint)
 		}
 	}
 	return r

@@ -5,6 +5,8 @@ import (
 	"portal-server/api/controller"
 	"portal-server/api/controller/context"
 
+	"portal-server/api/errs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -15,7 +17,7 @@ func SyncMessagesEndpoint(c *gin.Context) {
 	messageID := c.Param("mid")
 	messages, err := store.Messages().GetMessagesSince(user, messageID)
 	if err == gorm.RecordNotFound {
-		c.JSON(http.StatusBadRequest, controller.RenderError(err))
+		c.JSON(http.StatusNotFound, controller.RenderError(errs.ErrMessageNotFound))
 		return
 	}
 	if err != nil {

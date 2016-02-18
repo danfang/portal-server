@@ -19,14 +19,7 @@ type DetailError struct {
 }
 
 // A SuccessResponse denotes whether or not an action was successful.
-//
-// swagger:response success
 type SuccessResponse struct {
-	// in: body
-	Body successResponse
-}
-
-type successResponse struct {
 	Success bool `json:"success"`
 }
 
@@ -43,6 +36,6 @@ func RenderError(e error) interface{} {
 }
 
 // RenderSuccess generates JSON output for a successful operation.
-func RenderSuccess() interface{} {
-	return successResponse{true}
+func RenderSuccess(success bool) interface{} {
+	return SuccessResponse{success}
 }

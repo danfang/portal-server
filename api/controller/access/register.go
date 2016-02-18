@@ -59,7 +59,7 @@ func RegisterEndpoint(c *gin.Context) {
 	})
 	// Send confirmation email to user
 	sendTokenToUser(user.Email, verificationToken)
-	c.JSON(http.StatusOK, controller.RenderSuccess())
+	c.JSON(http.StatusOK, controller.RenderSuccess(true))
 }
 
 func createDefaultUser(store store.Store, body *passwordRegistration) (*model.User, error) {

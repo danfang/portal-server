@@ -16,5 +16,5 @@ type Message struct {
 	MessageID string `sql:"not null"`
 	Status    string `sql:"not null"`
 	To        string `sql:"not null"`
-	Body      string `sql:"not null"`
+	Body      string `sql:"type:text; not null"`
 }

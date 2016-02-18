@@ -6,9 +6,7 @@ clone:
   path: portal-server
 
 build:
-  image: golang:1.5
-  environment:
-    - GO15VENDOREXPERIMENT=1
+  image: golang:1.6
   commands:
     - go test -cover ./api/... ./gcm/... ./store/...
 

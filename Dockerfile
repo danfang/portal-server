@@ -1,7 +1,6 @@
-FROM golang:1.5
+FROM golang:1.6
 
-ENV GOPATH=/ \
-    GO15VENDOREXPERIMENT=1
+ENV GOPATH=/
 
 RUN mkdir -p /src/portal-server/
 

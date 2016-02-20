@@ -1,7 +1,7 @@
 Portal API Server
 ==
 
-[![Build Status](https://build.portalmessaging.com/api/badges/backend/portal-server/status.svg)](https://build.portalmessaging.com/backend/portal-server)
+[![Build Status](https://build.portalmessaging.com/api/badges/danfang/portal-server/status.svg)](https://build.portalmessaging.com/danfang/portal-server)
 
 [API Documentation](http://swagger.portalmessaging.com/) can be found here.
 

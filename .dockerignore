@@ -1,7 +1,8 @@
+README.md
+env/
+*.iml
 .git/
 .idea/
-*.iml
 .secrets.yml
 .drone.yml
 .drone.sec
-README.md

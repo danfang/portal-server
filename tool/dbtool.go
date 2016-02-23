@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"portal-server/model"
+	. "portal-server/model"
 	"portal-server/store"
 )
 
@@ -40,19 +40,19 @@ func main() {
 	switch args[0] {
 	case "drop":
 		db.DropTable(
-			&model.User{}, &model.VerificationToken{}, &model.LinkedAccount{}, &model.UserToken{},
-			&model.NotificationKey{}, &model.Device{}, &model.Message{}, &model.Contact{}, &model.EncryptionKey{})
+			&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
+			&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &ContactPhone{}, &EncryptionKey{})
 
 	case "create":
 		db.CreateTable(
-			&model.User{}, &model.VerificationToken{}, &model.LinkedAccount{}, &model.UserToken{},
-			&model.NotificationKey{}, &model.Device{}, &model.Message{}, &model.Contact{}, &model.EncryptionKey{})
-		db.Model(&model.LinkedAccount{}).AddUniqueIndex("idx_linked_account_type_account_id", "type", "account_id")
+			&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
+			&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &ContactPhone{}, &EncryptionKey{})
+		db.Model(&LinkedAccount{}).AddUniqueIndex("idx_linked_account_type_account_id", "type", "account_id")
 
 	case "migrate":
 		db.AutoMigrate(
-			&model.User{}, &model.VerificationToken{}, &model.LinkedAccount{}, &model.UserToken{},
-			&model.NotificationKey{}, &model.Device{}, &model.Message{}, &model.Contact{}, &model.EncryptionKey{})
-		db.Model(&model.LinkedAccount{}).AddUniqueIndex("idx_linked_account_type_account_id", "type", "account_id")
+			&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
+			&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &ContactPhone{}, &EncryptionKey{})
+		db.Model(&LinkedAccount{}).AddUniqueIndex("idx_linked_account_type_account_id", "type", "account_id")
 	}
 }

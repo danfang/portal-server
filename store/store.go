@@ -13,6 +13,7 @@ type Store interface {
 	Transaction(t func(txStore Store) error)
 	Users() UserStore
 	LinkedAccounts() LinkedAccountStore
+	Contacts() ContactStore
 	Devices() DeviceStore
 	EncryptionKeys() EncryptionKeyStore
 	Messages() MessageStore
@@ -26,6 +27,7 @@ type store struct {
 	db                 *gorm.DB
 	users              userStore
 	linkedAccounts     linkedAccountStore
+	contacts           contactStore
 	devices            deviceStore
 	encryptionKeys     encryptionKeyStore
 	messages           messageStore
@@ -47,6 +49,7 @@ func (s *store) Transaction(t func(txStore Store) error) {
 
 func (s *store) Users() UserStore                           { return s.users }
 func (s *store) LinkedAccounts() LinkedAccountStore         { return s.linkedAccounts }
+func (s *store) Contacts() ContactStore                     { return s.contacts }
 func (s *store) Devices() DeviceStore                       { return s.devices }
 func (s *store) EncryptionKeys() EncryptionKeyStore         { return s.encryptionKeys }
 func (s *store) Messages() MessageStore                     { return s.messages }
@@ -59,6 +62,7 @@ func New(db *gorm.DB) Store {
 		db:                 db,
 		users:              userStore{db},
 		linkedAccounts:     linkedAccountStore{db},
+		contacts:           contactStore{db},
 		devices:            deviceStore{db},
 		encryptionKeys:     encryptionKeyStore{db},
 		messages:           messageStore{db},

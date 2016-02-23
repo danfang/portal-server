@@ -20,7 +20,7 @@ func GetTestDB() *gorm.DB {
 	db, _ := gorm.Open("sqlite3", ":memory:")
 	db.LogMode(false)
 	db.CreateTable(&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
-		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &EncryptionKey{})
+		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &ContactPhone{}, &EncryptionKey{})
 	return &db
 }
 
@@ -30,7 +30,7 @@ func TeardownTestDB(db *gorm.DB) {
 		return
 	}
 	db.DropTableIfExists(&User{}, &VerificationToken{}, &LinkedAccount{}, &UserToken{},
-		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &EncryptionKey{})
+		&NotificationKey{}, &Device{}, &Message{}, &Contact{}, &ContactPhone{}, &EncryptionKey{})
 }
 
 func (s *store) teardown() {

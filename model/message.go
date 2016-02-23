@@ -13,7 +13,7 @@ type Message struct {
 	gorm.Model
 	User      User
 	UserID    uint   `sql:"not null"`
-	MessageID string `sql:"not null; unique"`
+	MessageID string `sql:"not null; unique_index"`
 	Status    string `sql:"not null"`
 	To        string `sql:"not null"`
 	Body      string `sql:"type:text; not null"`

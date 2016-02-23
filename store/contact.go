@@ -17,7 +17,9 @@ type contactStore struct {
 }
 
 func (db contactStore) CreateContact(proto *Contact) error {
-	return db.Create(proto).Error
+	return db.Where(&Contact{
+		UUID: proto.UUID,
+	}).Assign(proto).FirstOrCreate(&Contact{}).Error
 }
 
 func (db contactStore) FindContact(where *Contact) (*Contact, bool) {

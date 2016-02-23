@@ -37,6 +37,7 @@ func TestGetContacts(t *testing.T) {
 				Email: "hello@world.com",
 			}
 			s.Users().CreateUser(&user)
+
 			w := testGetContacts(s, &user)
 			assert.Equal(t, 200, w.Code)
 
@@ -51,7 +52,8 @@ func TestGetContacts(t *testing.T) {
 				Email: "hello@world.com",
 			}
 			s.Users().CreateUser(&user)
-			numContacts := 5
+
+			numContacts := 500
 			for i := 0; i < numContacts; i++ {
 				contact := model.Contact{
 					UserID: user.ID,
@@ -59,12 +61,12 @@ func TestGetContacts(t *testing.T) {
 					UUID:   uuid.NewV4().String(),
 					PhoneNumbers: []model.ContactPhone{
 						{
-							Name:   fmt.Sprintf("home%d", i),
-							Number: fmt.Sprintf("homenumber%d", i),
+							Type:   "home",
+							Number: "1234567890",
 						},
 						{
-							Name:   fmt.Sprintf("cell%d", i),
-							Number: fmt.Sprintf("cellnumber%d", i),
+							Type:   "cell",
+							Number: "0987654321",
 						},
 					},
 				}
@@ -76,7 +78,7 @@ func TestGetContacts(t *testing.T) {
 
 			var response contactsJson
 			json.Unmarshal(w.Body.Bytes(), &response)
-			assert.Equal(t, 5, len(response.Contacts))
+			assert.Equal(t, numContacts, len(response.Contacts))
 			for i := 0; i < numContacts; i++ {
 				contact := response.Contacts[i]
 				assert.Equal(t, 2, len(contact.PhoneNumbers))

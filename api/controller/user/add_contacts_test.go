@@ -40,7 +40,7 @@ func TestAddContacts(t *testing.T) {
 				Email: "hello@world.com",
 			}
 			s.Users().CreateUser(&user)
-			numContacts := 5
+			numContacts := 500
 
 			contactsJson := make([]map[string]interface{}, 0, numContacts)
 			for i := 0; i < numContacts; i++ {
@@ -49,12 +49,12 @@ func TestAddContacts(t *testing.T) {
 					"cid":  uuid.NewV4().String(),
 					"phone_numbers": []map[string]string{
 						{
-							"name":   fmt.Sprintf("home%d", i),
-							"number": fmt.Sprintf("homenumber%d", i),
+							"type":   "home",
+							"number": "1234567890",
 						},
 						{
-							"name":   fmt.Sprintf("cell%d", i),
-							"number": fmt.Sprintf("cellnumber%d", i),
+							"type":   "cell",
+							"number": "0987654321",
 						},
 					},
 				}
@@ -70,7 +70,6 @@ func TestAddContacts(t *testing.T) {
 			var response controller.SuccessResponse
 			json.Unmarshal(w.Body.Bytes(), &response)
 			assert.True(t, response.Success)
-
 			for i := 0; i < numContacts; i++ {
 				contact, _ := s.Contacts().FindContact(&model.Contact{
 					UserID: user.ID,
@@ -92,12 +91,12 @@ func TestAddContacts(t *testing.T) {
 					"uuid": uuid.NewV4().String(),
 					"phone_numbers": []map[string]string{
 						{
-							"name":   "home",
+							"type":   "home",
 							"number": "homenumber",
 						},
 						{
-							"name":   "cell",
-							"number": "cell1number",
+							"type":   "cell",
+							"number": "cellnumber",
 						},
 					},
 				},
@@ -121,12 +120,12 @@ func TestAddContacts(t *testing.T) {
 					"cid":  "not-a-uuid",
 					"phone_numbers": []map[string]string{
 						{
-							"name":   "home",
+							"type":   "home",
 							"number": "homenumber",
 						},
 						{
-							"name":   "cell",
-							"number": "cell1number",
+							"type":   "cell",
+							"number": "cellnumber",
 						},
 					},
 				},

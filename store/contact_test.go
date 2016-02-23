@@ -37,11 +37,11 @@ func TestContactStore(t *testing.T) {
 				UUID: uuid.NewV4().String(),
 				PhoneNumbers: []model.ContactPhone{
 					{
-						Name:   "home",
+						Type:   "home",
 						Number: "1",
 					},
 					{
-						Name:   "cell",
+						Type:   "cell",
 						Number: "2",
 					},
 				},
@@ -52,11 +52,11 @@ func TestContactStore(t *testing.T) {
 				UUID: uuid.NewV4().String(),
 				PhoneNumbers: []model.ContactPhone{
 					{
-						Name:   "home2",
+						Type:   "home",
 						Number: "3",
 					},
 					{
-						Name:   "cell2",
+						Type:   "cell",
 						Number: "4",
 					},
 				},
@@ -67,11 +67,11 @@ func TestContactStore(t *testing.T) {
 				UUID: uuid.NewV4().String(),
 				PhoneNumbers: []model.ContactPhone{
 					{
-						Name:   "home3",
+						Type:   "home",
 						Number: "5",
 					},
 					{
-						Name:   "cell3",
+						Type:   "cell",
 						Number: "6",
 					},
 				},
@@ -91,10 +91,10 @@ func TestContactStore(t *testing.T) {
 
 			assertContact(t, db, &user, "contact1", "home", "1")
 			assertContact(t, db, &user, "contact1", "cell", "2")
-			assertContact(t, db, &user, "contact2", "home2", "3")
-			assertContact(t, db, &user, "contact2", "cell2", "4")
-			assertContact(t, db, &user, "contact3", "home3", "5")
-			assertContact(t, db, &user, "contact3", "cell3", "6")
+			assertContact(t, db, &user, "contact2", "home", "3")
+			assertContact(t, db, &user, "contact2", "cell", "4")
+			assertContact(t, db, &user, "contact3", "home", "5")
+			assertContact(t, db, &user, "contact3", "cell", "6")
 		})
 	})
 }
@@ -112,7 +112,7 @@ func assertContact(t *testing.T, db *gorm.DB, user *model.User, contactName, pho
 	var phone model.ContactPhone
 	db.Where(&model.ContactPhone{
 		ContactID: contact.ID,
-		Name:      phoneName,
+		Type:      phoneName,
 	}).First(&phone)
 
 	assert.Equal(t, phoneNumber, phone.Number)

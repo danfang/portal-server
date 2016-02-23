@@ -23,13 +23,14 @@ func AddContactsEndpoint(c *gin.Context) {
 	user := context.UserFromContext(c)
 	s := context.StoreFromContext(c)
 	s.Transaction(func(store store.Store) error {
-		for _, c := range body.Contacts {
-			c.UserID = user.ID
-			if err := store.Contacts().CreateContact(&c); err != nil {
+		for _, contact := range body.Contacts {
+			contact.UserID = user.ID
+			if err := store.Contacts().CreateContact(&contact); err != nil {
+				controller.InternalServiceError(c, err)
 				return err
 			}
 		}
+		c.JSON(http.StatusOK, controller.RenderSuccess(true))
 		return nil
 	})
-	c.JSON(http.StatusOK, controller.RenderSuccess(true))
 }

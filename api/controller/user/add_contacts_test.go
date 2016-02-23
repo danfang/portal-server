@@ -3,6 +3,7 @@ package user
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"portal-server/api/controller"
@@ -44,16 +45,16 @@ func TestAddContacts(t *testing.T) {
 			contactsJson := make([]map[string]interface{}, 0, numContacts)
 			for i := 0; i < numContacts; i++ {
 				contact := map[string]interface{}{
-					"name": "contact" + string(i),
+					"name": fmt.Sprintf("contact%d", i),
 					"cid":  uuid.NewV4().String(),
 					"phone_numbers": []map[string]string{
 						{
-							"name":   "home" + string(i),
-							"number": "homenumber" + string(i),
+							"name":   fmt.Sprintf("home%d", i),
+							"number": fmt.Sprintf("homenumber%d", i),
 						},
 						{
-							"name":   "cell" + string(i),
-							"number": "cell1number" + string(i),
+							"name":   fmt.Sprintf("cell%d", i),
+							"number": fmt.Sprintf("cellnumber%d", i),
 						},
 					},
 				}
@@ -73,7 +74,7 @@ func TestAddContacts(t *testing.T) {
 			for i := 0; i < numContacts; i++ {
 				contact, _ := s.Contacts().FindContact(&model.Contact{
 					UserID: user.ID,
-					Name:   "contact" + string(i),
+					Name:   fmt.Sprintf("contact%d", i),
 				})
 				assert.Equal(t, 2, len(contact.PhoneNumbers))
 			}
@@ -140,21 +141,13 @@ func TestAddContacts(t *testing.T) {
 }
 
 func testAddContacts(s store.Store, user *model.User, input interface{}) *httptest.ResponseRecorder {
-	// Setup router
-	r := testutil.TestRouter(
-		middleware.SetStore(s),
-	)
-
+	r := testutil.TestRouter(middleware.SetStore(s))
 	r.Use(func(c *gin.Context) {
 		context.UserToContext(c, user)
 		c.Next()
 	})
-
-	// Setup endpoints
 	r.POST("/", AddContactsEndpoint)
 	w := httptest.NewRecorder()
-
-	// Send the input
 	body, _ := json.Marshal(input)
 	req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(string(body)))
 	r.ServeHTTP(w, req)

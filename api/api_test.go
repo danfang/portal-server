@@ -100,5 +100,19 @@ func TestAPI(t *testing.T) {
 			api.ServeHTTP(w, req)
 			assert.Equal(t, http.StatusUnauthorized, w.Code)
 		})
+
+		g.It("Should allow a POST /user/contacts", func() {
+			req, _ := http.NewRequest("POST", "/v1/user/contacts", bytes.NewBufferString(""))
+			w := httptest.NewRecorder()
+			api.ServeHTTP(w, req)
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		})
+
+		g.It("Should allow a GET /user/contacts", func() {
+			req, _ := http.NewRequest("GET", "/v1/user/contacts", nil)
+			w := httptest.NewRecorder()
+			api.ServeHTTP(w, req)
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		})
 	})
 }

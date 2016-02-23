@@ -3,17 +3,17 @@ package model
 import "github.com/jinzhu/gorm"
 
 type Contact struct {
-	gorm.Model
-	User         User
-	UserID       uint           `sql:"not null"`
-	UUID         string         `sql:"not null; type:uuid"`
-	Name         string         `sql:"not null"`
-	PhoneNumbers []ContactPhone `sql:"not null"`
+	gorm.Model   `json:"-"`
+	User         User           `json:"-"`
+	UserID       uint           `sql:"not null" json:"-"`
+	UUID         string         `sql:"not null; type:uuid" json:"cid" valid:"required,uuid"`
+	Name         string         `sql:"not null" json:"name"           valid:"required"`
+	PhoneNumbers []ContactPhone `sql:"not null" json:"phone_numbers"  valid:"required"`
 }
 
 type ContactPhone struct {
-	gorm.Model
-	ContactID uint   `sql:"not null"`
-	Number    string `sql:"not null"`
-	Name      string
+	gorm.Model `json:"-"`
+	ContactID  uint   `sql:"not null" json:"-"`
+	Number     string `sql:"not null" json:"number" valid:"required"`
+	Name       string `sql:"not null" json:"name" valid:"required"`
 }

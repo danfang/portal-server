@@ -9,6 +9,7 @@ import (
 type ContactStore interface {
 	CreateContact(*Contact) error
 	FindContact(where *Contact) (*Contact, bool)
+	GetContactsByUser(user *User) ([]Contact, error)
 }
 
 type contactStore struct {
@@ -21,13 +22,18 @@ func (db contactStore) CreateContact(proto *Contact) error {
 
 func (db contactStore) FindContact(where *Contact) (*Contact, bool) {
 	var contact Contact
-	if db.Where(where).First(&contact).RecordNotFound() {
+	if db.Where(where).Preload("PhoneNumbers").First(&contact).RecordNotFound() {
 		return nil, false
 	}
-	var phones []ContactPhone
-	if err := db.Model(&contact).Related(&phones).Error; err != nil {
-		return nil, false
-	}
-	contact.PhoneNumbers = phones
 	return &contact, true
+}
+
+func (db contactStore) GetContactsByUser(user *User) ([]Contact, error) {
+	var contacts []Contact
+	if err := db.Where(&Contact{
+		UserID: user.ID,
+	}).Preload("PhoneNumbers").Find(&contacts).Error; err != nil {
+		return nil, err
+	}
+	return contacts, nil
 }

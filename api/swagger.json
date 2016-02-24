@@ -109,189 +109,14 @@
         }
       }
     },
-    "/user/devices": {
+    "/verify/{token}": {
       "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Retrieve a user's existing connected devices.",
-        "operationId": "getDevices",
+        "summary": "Consume a user email verification token.",
+        "operationId": "verifyToken",
         "parameters": [
           {
             "type": "string",
-            "name": "X-USER-TOKEN",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "X-USER-ID",
-            "in": "header",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/deviceList"
-          },
-          "401": {
-            "$ref": "#/responses/error"
-          },
-          "500": {
-            "$ref": "#/responses/error"
-          },
-          "default": {
-            "$ref": "#/responses/detailError"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Register a new Google Cloud Messaging device.",
-        "operationId": "addDevice",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "X-USER-TOKEN",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "X-USER-ID",
-            "in": "header",
-            "required": true
-          },
-          {
-            "name": "add_device",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/addDevice"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/addDevice"
-          },
-          "401": {
-            "$ref": "#/responses/error"
-          },
-          "500": {
-            "$ref": "#/responses/error"
-          },
-          "default": {
-            "$ref": "#/responses/detailError"
-          }
-        }
-      }
-    },
-    "/user/messages/history": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Retrieve a user's latest messages (up to a limit).",
-        "operationId": "messageHistory",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "X-USER-TOKEN",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "X-USER-ID",
-            "in": "header",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/messageHistoryResponse"
-          },
-          "401": {
-            "$ref": "#/responses/error"
-          },
-          "500": {
-            "$ref": "#/responses/error"
-          },
-          "default": {
-            "$ref": "#/responses/detailError"
-          }
-        }
-      }
-    },
-    "/user/messages/sync/{mid}": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Get all messages after a given message id.",
-        "operationId": "messageSync",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "X-USER-TOKEN",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "X-USER-ID",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "mid",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/messageHistoryResponse"
-          },
-          "401": {
-            "$ref": "#/responses/error"
-          },
-          "404": {
-            "$ref": "#/responses/error"
-          },
-          "500": {
-            "$ref": "#/responses/error"
-          }
-        }
-      }
-    },
-    "/user/messages/{mid}": {
-      "delete": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Deletes a given message.",
-        "operationId": "messageDelete",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "X-USER-TOKEN",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "X-USER-ID",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "mid",
+            "name": "token",
             "in": "path",
             "required": true
           }
@@ -300,10 +125,7 @@
           "200": {
             "$ref": "#/responses/success"
           },
-          "401": {
-            "$ref": "#/responses/error"
-          },
-          "404": {
+          "400": {
             "$ref": "#/responses/error"
           },
           "500": {
@@ -354,14 +176,189 @@
         }
       }
     },
-    "/verify/{token}": {
+    "/user/devices": {
       "get": {
-        "summary": "Consume a user email verification token.",
-        "operationId": "verifyToken",
+        "tags": [
+          "devices"
+        ],
+        "summary": "Retrieve a user's existing connected devices.",
+        "operationId": "getDevices",
         "parameters": [
           {
             "type": "string",
-            "name": "token",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/deviceList"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Register a new Google Cloud Messaging device.",
+        "operationId": "addDevice",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "add_device",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addDevice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/addDevice"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      }
+    },
+    "/user/messages/history": {
+      "get": {
+        "tags": [
+          "messages"
+        ],
+        "summary": "Retrieve a user's latest messages (up to a limit).",
+        "operationId": "messageHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/messageHistoryResponse"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          },
+          "default": {
+            "$ref": "#/responses/detailError"
+          }
+        }
+      }
+    },
+    "/user/messages/sync/{mid}": {
+      "get": {
+        "tags": [
+          "messages"
+        ],
+        "summary": "Get all messages after a given message id.",
+        "operationId": "messageSync",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "mid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/messageHistoryResponse"
+          },
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "404": {
+            "$ref": "#/responses/error"
+          },
+          "500": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/user/messages/{mid}": {
+      "delete": {
+        "tags": [
+          "messages"
+        ],
+        "summary": "Deletes a given message.",
+        "operationId": "messageDelete",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "X-USER-TOKEN",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "X-USER-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "mid",
             "in": "path",
             "required": true
           }
@@ -370,7 +367,10 @@
           "200": {
             "$ref": "#/responses/success"
           },
-          "400": {
+          "401": {
+            "$ref": "#/responses/error"
+          },
+          "404": {
             "$ref": "#/responses/error"
           },
           "500": {
@@ -382,7 +382,7 @@
     "/user/contacts": {
       "get": {
         "tags": [
-          "user"
+          "contacts"
         ],
         "summary": "Retrieve user contacts.",
         "operationId": "getContacts",
@@ -417,7 +417,7 @@
       },
       "post": {
         "tags": [
-          "user"
+          "contacts"
         ],
         "summary": "Upload user contacts.",
         "operationId": "addContacts",
@@ -669,11 +669,11 @@
     "contactPhoneNumber": {
       "type": "object",
       "required": [
-        "name",
+        "type",
         "number"
       ],
       "properties": {
-        "name": {
+        "type": {
           "type": "string"
         },
         "number": {
